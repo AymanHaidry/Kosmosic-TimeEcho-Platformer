@@ -82,6 +82,11 @@ TEP.Game = (() => {
       flagObj:        new TEP.Flag(def.goalPos[0], def.goalPos[1]),
     };
 
+    // Start BGM for this level
+    if (TEP.Sound?.startBGM) {
+      try { TEP.Sound.startBGM(def.theme || 'cave'); } catch(e) { console.warn('BGM start failed', e); }
+    }
+    
     resetLevelState();
   }
 
