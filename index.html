@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#0a0a1a"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  
+  <title>Time Echo Platformer</title>
+  <meta name="description" content="Beat puzzles with your past self. A pixel-art time-echo platformer where you record echoes of yourself to solve puzzles."/>
+  <meta name="keywords" content="platformer, puzzle, game, pixel-art, time-travel, echo"/>
+  
+  <link rel="stylesheet" href="style.css"/>
+  
+  <!-- Pixel font preload -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" as="style"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"/>
+</head>
+<body>
+<div id="app-container">
+  <!-- ══ NAV ═══════════════════════════════════════════ -->
+  <nav id="nav" role="navigation">
+    <div class="logo" onclick="TEP.UI.showMenu()" role="button" tabindex="0" title="Go to main menu">
+      TIME<span>ECHO</span>
+    </div>
+    <div class="nav-links">
+      <button class="nav-btn" onclick="TEP.UI.showMenu()" type="button">PLAY</button>
+      <button class="nav-btn" onclick="TEP.UI.showShop()" type="button">SHOP</button>
+      <button class="nav-btn" onclick="TEP.UI.showLeaderboard()" type="button">SCORES</button>
+      <button class="nav-btn" onclick="TEP.UI.showAchievements()" type="button">TROPHIES</button>
+      <button class="nav-btn" onclick="TEP.UI.showHelp()" type="button">HOW TO PLAY</button>
+
+      <!-- Guest -->
+      <div id="nav-guest">
+        <button class="nav-btn accent" onclick="TEP.UI.showAuth('login')" type="button">LOGIN</button>
+        <button class="nav-btn" onclick="TEP.UI.showAuth('register')" type="button">REGISTER</button>
+      </div>
+
+      <!-- Logged in -->
+      <div id="nav-user" class="hidden" style="display:flex;align-items:center;gap:8px;">
+        <span id="nav-username"></span>
+        <span id="nav-coins"></span>
+        <button class="nav-btn danger" id="logout-btn" type="button">LOGOUT</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══ GAME AREA ═════════════════════════════════════ -->
+  <main id="main-game">
+    <!-- Canvas for rendering game -->
+    <div id="canvas-wrap" role="img" aria-label="Game canvas">
+      <canvas id="game-canvas" width="900" height="500" title="Time Echo Game Canvas"></canvas>
+    </div>
+
+    <!-- Mobile touch controls -->
+    <aside id="touch-controls" aria-label="Mobile game controls">
+      <div class="touch-dpad" title="Movement controls">
+        <button class="touch-btn" id="tc-left" type="button" aria-label="Move left">◀</button>
+        <button class="touch-btn" id="tc-right" type="button" aria-label="Move right">▶</button>
+      </div>
+      <div class="touch-actions" title="Action controls">
+        <button class="touch-btn" id="tc-record" type="button" aria-label="Record echo">●REC</button>
+        <button class="touch-btn" id="tc-jump" type="button" aria-label="Jump">▲</button>
+      </div>
+    </aside>
+  </main>
+
+  <!-- ══ PANELS ═════════════════════════════════════════ -->
+  <div id="panels-container">
+
+<!-- ── MAIN MENU ──────────────────────────────────── -->
+<div class="tep-panel" id="main-menu">
+  <div class="panel-box" style="max-width:900px;text-align:center;">
+    <div class="hero-title">TIME ECHO</div>
+    <div class="hero-sub">Beat puzzles with your past self.</div>
+
+    <div class="menu-actions">
+      <button class="menu-btn primary" onclick="TEP.UI.showMenu()">▶ SELECT LEVEL</button>
+      <button class="menu-btn" onclick="TEP.Game.startEndless()">∞ ENDLESS MODE</button>
+      <button class="menu-btn" onclick="TEP.Game.startEndless(TEP.getDailySeed())">📅 DAILY CHALLENGE</button>
+      <button class="menu-btn" onclick="TEP.UI.showShop()">🛍 SHOP</button>
+      <button class="menu-btn" onclick="TEP.UI.showLeaderboard()">🏆 LEADERBOARD</button>
+    </div>
+
+    <div class="section-title">— SELECT LEVEL —</div>
+    <div id="level-grid"></div>
+
+    <div style="margin-top:18px;font-family:var(--font-pixel);font-size:7px;color:var(--muted);line-height:2;">
+      🎮 MOVE: A D / ← →&nbsp;&nbsp;&nbsp;JUMP: W / SPACE&nbsp;&nbsp;&nbsp;ECHO: E&nbsp;&nbsp;&nbsp;RESTART: R&nbsp;&nbsp;&nbsp;PAUSE: ESC
+    </div>
+  </div>
+</div>
+
+<!-- ── AUTH PANEL ─────────────────────────────────── -->
+<div class="tep-panel hidden" id="auth-panel">
+  <div class="panel-box" style="max-width:420px;">
+    <button class="close-btn" onclick="TEP.UI.hideAll();TEP.UI.showMenu()">✕</button>
+    <h2>ACCOUNT</h2>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="auth-login-tab" onclick="TEP.UI.switchAuthTab('login')">LOGIN</button>
+      <button class="auth-tab"        id="auth-reg-tab"   onclick="TEP.UI.switchAuthTab('register')">REGISTER</button>
+    </div>
+
+    <!-- Login form -->
+    <form id="auth-login-form" onsubmit="TEP.UI.handleLogin(event)">
+      <div class="field-row">
+        <label>EMAIL</label>
+        <input type="email" id="login-email" placeholder="you@email.com" required/>
+      </div>
+      <div class="field-row">
+        <label>PASSWORD</label>
+        <input type="password" id="login-pass" placeholder="••••••••" required/>
+      </div>
+      <button type="submit" class="submit-btn" id="login-btn">LOGIN</button>
+    </form>
+
+    <!-- Register form -->
+    <form id="auth-reg-form" class="hidden" onsubmit="TEP.UI.handleRegister(event)">
+      <div class="field-row">
+        <label>USERNAME</label>
+        <input type="text" id="reg-name" placeholder="TimeHero42" minlength="3" required/>
+      </div>
+      <div class="field-row">
+        <label>EMAIL</label>
+        <input type="email" id="reg-email" placeholder="you@email.com" required/>
+      </div>
+      <div class="field-row">
+        <label>PASSWORD</label>
+        <input type="password" id="reg-pass" placeholder="Min 6 characters" minlength="6" required/>
+      </div>
+      <button type="submit" class="submit-btn" id="reg-btn">CREATE ACCOUNT</button>
+    </form>
+
+    <div id="auth-err"></div>
+    <div class="auth-guest-note">
+      You can play as a guest — but <a onclick="TEP.UI.switchAuthTab('register')">register free</a>
+      to save progress &amp; appear on the worldwide leaderboard.
+    </div>
+  </div>
+</div>
+
+<!-- ── SHOP PANEL ─────────────────────────────────── -->
+<div class="tep-panel hidden" id="shop-panel">
+  <div class="panel-box" style="max-width:800px;max-height:90vh;overflow-y:auto;">
+    <button class="close-btn" onclick="TEP.UI.showMenu()">✕</button>
+    <h2>SHOP</h2>
+    <div class="shop-coins-bar">
+      <div id="shop-coins">🪙 0</div>
+      <button class="nav-btn" onclick="TEP.UI.showMenu()">← Back</button>
+    </div>
+    <div class="shop-section-title">👕 OUTFITS</div>
+    <div class="shop-grid" id="outfit-grid"></div>
+    <div class="shop-section-title">🐾 PETS</div>
+    <div class="shop-grid" id="pet-grid"></div>
+  </div>
+</div>
+
+<!-- ── LEADERBOARD PANEL ──────────────────────────── -->
+<div class="tep-panel hidden" id="lb-panel">
+  <div class="panel-box" style="max-width:700px;max-height:90vh;overflow-y:auto;">
+    <button class="close-btn" onclick="TEP.UI.showMenu()">✕</button>
+    <h2>🏆 LEADERBOARD</h2>
+    <div class="lb-filters">
+      <label>LEVEL</label>
+      <select id="lb-level-sel" onchange="TEP.UI.showLeaderboard()">
+        <option value="0">Endless</option>
+        <option value="1" selected>Level 1</option>
+        <option value="2">Level 2</option>
+        <option value="3">Level 3</option>
+        <option value="4">Level 4</option>
+        <option value="5">Level 5</option>
+        <option value="6">Level 6</option>
+        <option value="7">Level 7</option>
+        <option value="8">Level 8</option>
+        <option value="9">Level 9</option>
+        <option value="10">Level 10</option>
+      </select>
+      <label>MODE</label>
+      <select id="lb-mode-sel" onchange="TEP.UI.showLeaderboard()">
+        <option value="campaign">Campaign</option>
+        <option value="endless">Endless</option>
+        <option value="daily">Daily</option>
+      </select>
+      <button class="nav-btn" onclick="TEP.UI.showLeaderboard()">↺ REFRESH</button>
+    </div>
+    <table class="lb-table">
+      <thead>
+        <tr>
+          <th>#</th><th>PLAYER</th><th>SCORE</th><th>TIME</th><th>ECHOES</th>
+        </tr>
+      </thead>
+      <tbody id="lb-body">
+        <tr><td colspan="5" style="color:var(--muted);padding:20px;">
+          Sign in and play to see scores here!
+        </td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:16px;text-align:right;">
+      <button class="nav-btn" onclick="TEP.UI.showMenu()">← Back to Menu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── ACHIEVEMENTS PANEL ─────────────────────────── -->
+<div class="tep-panel hidden" id="ach-panel">
+  <div class="panel-box" style="max-width:760px;max-height:90vh;overflow-y:auto;">
+    <button class="close-btn" onclick="TEP.UI.showMenu()">✕</button>
+    <h2>🏆 ACHIEVEMENTS</h2>
+    <div id="ach-grid"></div>
+    <div style="margin-top:18px;text-align:right;">
+      <button class="nav-btn" onclick="TEP.UI.showMenu()">← Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── HELP PANEL ─────────────────────────────────── -->
+<div class="tep-panel hidden" id="help-panel">
+  <div class="panel-box" style="max-width:680px;">
+    <button class="close-btn" onclick="TEP.UI.showMenu()">✕</button>
+    <h2>HOW TO PLAY</h2>
+    <div class="controls-grid">
+      <div>
+        <div class="ctrl-row"><span class="ctrl-key">A / ←</span><span class="ctrl-desc">Move left</span></div>
+        <div class="ctrl-row"><span class="ctrl-key">D / →</span><span class="ctrl-desc">Move right</span></div>
+        <div class="ctrl-row"><span class="ctrl-key">W / SPACE</span><span class="ctrl-desc">Jump</span></div>
+        <div class="ctrl-row"><span class="ctrl-key">E</span><span class="ctrl-desc">Start / stop recording echo</span></div>
+      </div>
+      <div>
+        <div class="ctrl-row"><span class="ctrl-key">R</span><span class="ctrl-desc">Restart level</span></div>
+        <div class="ctrl-row"><span class="ctrl-key">ESC</span><span class="ctrl-desc">Pause / menu</span></div>
+        <div class="ctrl-row"><span class="ctrl-key">ENTER</span><span class="ctrl-desc">Next level (on complete)</span></div>
+      </div>
+    </div>
+    <div style="margin-top:22px;font-family:var(--font-ui);font-size:15px;color:var(--text);line-height:1.8;">
+      <p>Record up to <b>3 echoes</b> simultaneously. Each echo replays your recorded inputs from the spot you were standing.</p>
+      <p style="margin-top:10px;">Use echoes to hold <b style="color:#ffd166">switches</b>, block
+      <b style="color:#ff4455">enemies</b>, stand on <b style="color:#7efff5">pressure plates</b>,
+      or create stepping stones across gaps.</p>
+      <p style="margin-top:10px;color:var(--muted);">
+        ⚠️ <b style="color:#cc44ff">Echo Wisps</b> corrupt recordings.<br/>
+        ⚙️ <b style="color:#ff8833">Chrono Sentinels</b> rewind when hit by echoes.<br/>
+        👾 <b style="color:#ff00ff">Paradox Beasts</b> mirror your echoes as weapons!
+      </p>
+    </div>
+    <div style="margin-top:20px;">
+      <div style="font-family:var(--font-pixel);font-size:8px;color:var(--accent2);margin-bottom:10px;">ENEMIES</div>
+      <div style="font-family:var(--font-ui);font-size:14px;color:var(--muted);line-height:1.8;">
+        Beat levels to unlock the shop and earn coins. Register for a free account to save your progress and compete worldwide!
+      </div>
+    </div>
+    <div style="margin-top:18px;text-align:right;">
+      <button class="nav-btn" onclick="TEP.UI.showMenu()">← Back</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- End panels-container -->
+
+<!-- ══ TOAST ══════════════════════════════════════════ -->
+<div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<!-- ══ FOOTER ════════════════════════════════════════ -->
+<footer id="site-footer" role="contentinfo">
+  <div class="footer-content">
+    <p><strong>TIME ECHO PLATFORMER</strong> — Beat puzzles with your past self.</p>
+    <p>Made with pixels &amp; paradoxes | 
+      <button onclick="TEP.UI.showHelp()" type="button" style="background:none;border:none;color:inherit;cursor:pointer;text-decoration:underline;">HOW TO PLAY</button>
+    </p>
+  </div>
+</footer>
+
+</div><!-- End app-container -->
+
+<!-- ══ SCRIPTS (order matters) ══════════════════════ -->
+<script src="config.js"></script>
+<script src="supabase-client.js"></script>
+<script src="auth.js"></script>
+<script src="entities.js"></script>
+<script src="levels.js"></script>
+<script src="renderer.js"></script>
+<script src="game.js"></script>
+<script src="ui.js"></script>
+
+<!-- Fallback: ensure levels are loaded -->
+<script>
+// If levels.js didn't load properly, attempt to load it again
+(function() {
+  if (!window.TEP?.LEVELS) {
+    console.warn('Levels not loaded, attempting fallback...');
+    const script = document.createElement('script');
+    script.src = 'levels.js?t=' + Date.now();
+    script.onload = function() {
+      console.log('Levels loaded via fallback. Count:', window.TEP?.LEVELS?.length || 0);
+      // Force UI to update if needed
+      if (window.TEP?.UI?.showMenu) {
+        console.log('Updating menu...');
+      }
+    };
+    script.onerror = function() {
+      console.error('Failed to load levels.js');
+    };
+    document.head.appendChild(script);
+  }
+})();
+</script>
+
+<script>
+/* ── Bootstrap ─────────────────────────────────── */
+(async () => {
+  const canvas = document.getElementById('game-canvas');
+  
+  // FALLBACK: If levels not loaded, load them now
+  if (!window.TEP?.LEVELS) {
+    console.log('Loading levels from bootstrap...');
+    try {
+      const levelsResponse = await fetch('levels.js');
+      const levelsCode = await levelsResponse.text();
+      // Make sure TEP is in scope for eval
+      const TEP = window.TEP;
+      eval(levelsCode);
+      console.log('Levels loaded. Count:', TEP?.LEVELS?.length || 0);
+    } catch (e) {
+      console.error('Failed to load levels:', e);
+      // Set a minimal level array so the game doesn't crash
+      TEP.LEVELS = [];
+    }
+  }
+
+  // Init Auth (try restore session)
+  const restored = await TEP.Auth.init();
+  if (!restored) TEP.Auth.initGuest();
+
+  // Init game engine
+  TEP.Game.init(canvas);
+
+  // Show main menu
+  TEP.UI.showMenu();
+  TEP.UI.updateNavBar();
+
+  // Logout
+  document.getElementById('logout-btn').addEventListener('click', async () => {
+    await TEP.Auth.logout();
+    TEP.UI.updateNavBar();
+    TEP.UI.showMenu();
+    TEP.UI.showToast('👋 Logged out');
+  });
+
+  // ── Mobile touch controls ────────────────────────
+  function hookTouch(id, key) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('touchstart', e => {
+      e.preventDefault();
+      TEP.Game.keys[key] = true;
+    }, { passive: false });
+    el.addEventListener('touchend', () => { TEP.Game.keys[key] = false; });
+  }
+  hookTouch('tc-left',   'arrowleft');
+  hookTouch('tc-right',  'arrowright');
+  hookTouch('tc-jump',   ' ');
+  const recBtn = document.getElementById('tc-record');
+  if (recBtn) {
+    recBtn.addEventListener('touchstart', e => {
+      e.preventDefault();
+      // Simulate E keypress
+      const ev = new KeyboardEvent('keydown', { key: 'e' });
+      window.dispatchEvent(ev);
+      setTimeout(() => window.dispatchEvent(new KeyboardEvent('keyup', { key: 'e' })), 80);
+    }, { passive: false });
+  }
+
+  // ── Keyboard shortcut while playing ─────────────
+  window.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && TEP.Game.getState() === 'menu') {
+      TEP.UI.hideAll();
+    }
+  });
+})();
+</script>
+</body>
+</html>
