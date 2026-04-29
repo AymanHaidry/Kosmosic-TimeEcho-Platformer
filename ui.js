@@ -7,6 +7,59 @@ window.TEP = window.TEP || {};
 
 TEP.UI = (() => {
 
+  // ── Theme display data ─────────────────────────────
+  const THEME_PRIMARY = {
+    cave:          '#c49a20',
+    neon_city:     '#6030ff',
+    sunset_ruins:  '#e84800',
+    crystal_sky:   '#55d4ff',
+    haunted_forest:'#44cc22',
+    frozen_peaks:  '#9ae4f5',
+    lava_core:     '#dd3300',
+    temple_gold:   '#d4aa55',
+    paradox_void:  '#aa44ff',
+    sky_islands:   '#aaccee',
+    deep_ocean:    '#0099cc',
+    desert_night:  '#ddaa44',
+    blood_moon:    '#cc0040',
+    time_rift:     '#00eecc',
+    ember_ruins:   '#cc8833',
+  };
+  const THEME_EMOJIS = {
+    cave:          '🪨',
+    neon_city:     '🌆',
+    sunset_ruins:  '🌅',
+    crystal_sky:   '💎',
+    haunted_forest:'🌲',
+    frozen_peaks:  '❄️',
+    lava_core:     '🌋',
+    temple_gold:   '⛩️',
+    paradox_void:  '🌀',
+    sky_islands:   '☁️',
+    deep_ocean:    '🌊',
+    desert_night:  '🏜️',
+    blood_moon:    '🩸',
+    time_rift:     '⚡',
+    ember_ruins:   '🔥',
+  };
+  const THEME_BG = {
+    cave:          '#1a0a2e',
+    neon_city:     '#060d22',
+    sunset_ruins:  '#1a0533',
+    crystal_sky:   '#030c1a',
+    haunted_forest:'#050d05',
+    frozen_peaks:  '#030d1a',
+    lava_core:     '#0a0000',
+    temple_gold:   '#0a0a05',
+    paradox_void:  '#050010',
+    sky_islands:   '#1a4aaa',
+    deep_ocean:    '#000814',
+    desert_night:  '#05030a',
+    blood_moon:    '#0a0005',
+    time_rift:     '#000a0a',
+    ember_ruins:   '#100500',
+  };
+
   // ── Toast system ──────────────────────────────────
   let toastQ = [];
   let toastActive = false;
@@ -43,6 +96,12 @@ TEP.UI = (() => {
 
   function hideAll() {
     document.querySelectorAll('.tep-panel').forEach(p => p.classList.add('hidden'));
+  }
+
+  // ── Scroll to level select ─────────────────────────
+  function _scrollToLevels() {
+    const el = document.getElementById('level-select-title') || document.getElementById('level-grid');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   // ── Auth panel ─────────────────────────────────────
@@ -105,31 +164,76 @@ TEP.UI = (() => {
   function showMenu() {
     showPanel('main-menu');
     updateNavBar();
-    // Populate level select
+
     const grid = document.getElementById('level-grid');
     if (!grid) return;
     grid.innerHTML = '';
+
     const maxUnlocked = TEP.Auth.isLoggedIn()
       ? (TEP.Auth.getLevel() || 1)
       : (parseInt(localStorage.getItem('tep_guest_level') || '1'));
-    const totalLevels = TEP.LEVELS.length;
+    const totalLevels = TEP.LEVELS?.length || 20;
+
     for (let i = 1; i <= totalLevels + 2; i++) {
       const btn = document.createElement('button');
       btn.className = 'lvl-btn';
-      if (i > maxUnlocked && i <= totalLevels) btn.classList.add('locked');
-      if (i > totalLevels) btn.classList.add('generated');
-      btn.innerHTML = i <= totalLevels
-        ? `<span class="lvl-num">${i}</span><span class="lvl-name">${TEP.LEVELS[i-1]?.name || ''}</span>`
-        : i === totalLevels + 1
-          ? `<span class="lvl-num">∞</span><span class="lvl-name">ENDLESS</span>`
-          : `<span class="lvl-num">📅</span><span class="lvl-name">DAILY</span>`;
+
+      const lvlDef   = i <= totalLevels ? TEP.LEVELS[i - 1] : null;
+      const theme    = lvlDef?.theme || 'cave';
+      const color    = THEME_PRIMARY[theme]  || '#c49a20';
+      const bgColor  = THEME_BG[theme]       || '#1a0a2e';
+      const emoji    = THEME_EMOJIS[theme]   || '🎮';
+      const isNight  = lvlDef?.isNight;
+      const isLocked = i > maxUnlocked && i <= totalLevels;
+      const isGen    = i > totalLevels;
+
+      if (isLocked) btn.classList.add('locked');
+      if (isGen)    btn.classList.add('generated');
+
+      // Apply theme styling directly
+      btn.style.background  = bgColor;
+      btn.style.borderColor = isLocked ? 'rgba(42,42,90,0.5)' : `${color}55`;
+
+      if (i <= totalLevels) {
+        btn.innerHTML = `
+          <span class="lvl-btn-stripe" style="background:${color};box-shadow:0 0 8px ${color}66"></span>
+          <div class="lvl-btn-body">
+            <span class="lvl-theme">${emoji}</span>
+            <span class="lvl-num" style="color:${color};text-shadow:0 0 8px ${color}66">${i}</span>
+            <span class="lvl-name">${lvlDef?.name || ''}</span>
+            ${isNight ? '<span class="lvl-night">🌙</span>' : ''}
+            ${isLocked ? '<span style="font-size:10px;opacity:0.5">🔒</span>' : ''}
+          </div>`;
+      } else if (i === totalLevels + 1) {
+        btn.style.background  = '#050010';
+        btn.style.borderColor = '#aa44ff66';
+        btn.innerHTML = `
+          <span class="lvl-btn-stripe" style="background:linear-gradient(90deg,#aa44ff,#6030ff);box-shadow:0 0 8px #aa44ff66"></span>
+          <div class="lvl-btn-body">
+            <span class="lvl-theme">♾️</span>
+            <span class="lvl-num" style="color:#aa44ff;text-shadow:0 0 8px #aa44ff66;font-size:16px">∞</span>
+            <span class="lvl-name">ENDLESS</span>
+          </div>`;
+      } else {
+        btn.style.background  = '#050818';
+        btn.style.borderColor = '#ffd70066';
+        btn.innerHTML = `
+          <span class="lvl-btn-stripe" style="background:linear-gradient(90deg,#ffd700,#ff8800);box-shadow:0 0 8px #ffd70066"></span>
+          <div class="lvl-btn-body">
+            <span class="lvl-theme">📅</span>
+            <span class="lvl-num" style="color:#ffd700;text-shadow:0 0 8px #ffd70066;font-size:12px">DAY</span>
+            <span class="lvl-name">DAILY</span>
+          </div>`;
+      }
+
       btn.onclick = () => {
-        if (i <= totalLevels && i > maxUnlocked) { showToast('🔒 Complete earlier levels first!', '#ff7e7e'); return; }
+        if (isLocked) { showToast('🔒 Complete earlier levels first!', '#ff7e7e'); return; }
         hideAll();
         if (i === totalLevels + 1) { TEP.Game.startEndless(); }
         else if (i === totalLevels + 2) { TEP.Game.startEndless(TEP.getDailySeed()); }
         else { TEP.Game.startLevel(i); }
       };
+
       grid.appendChild(btn);
     }
   }
@@ -154,7 +258,7 @@ TEP.UI = (() => {
       const btn = document.createElement('div');
       btn.className = 'shop-item' + (equipped ? ' equipped' : '') + (owned ? '' : ' locked-item');
       btn.innerHTML = `
-        <div class="item-swatch" style="background:${o.color}"></div>
+        <div class="item-swatch" style="background:${o.color};box-shadow:0 0 10px ${o.color}66"></div>
         <div class="item-name">${o.name}</div>
         <div class="item-cost">${owned ? (equipped ? '✅ ON' : '✔ OWNED') : '🪙 '+o.cost}</div>`;
       btn.onclick = async () => {
@@ -265,5 +369,6 @@ TEP.UI = (() => {
     showToast,
     updateNavBar,
     hideAll,
+    _scrollToLevels,
   };
 })();
