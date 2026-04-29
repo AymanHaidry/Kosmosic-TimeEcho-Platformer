@@ -406,8 +406,12 @@ TEP.Renderer = (() => {
     drawEchonaut(sx, sy, actor.color || '#00d4ff', actor.facingRight, actor.isGhost ? 0 : _walkFrame, alpha);
   }
 
-  function drawActorTrail(actor, camX, camY, color) {
+ function drawActorTrail(actor, camX, camY, color) {
     const trail = actor.trail || [];
+    // Only draw trail when the actor is meaningfully moving
+    const isMoving = Math.abs(actor.vx) > 0.4 || Math.abs(actor.vy) > 1.0;
+    if (!isMoving || trail.length < 3) return;
+ 
     for (let i = 0; i < trail.length; i++) {
       const alpha = (i / trail.length) * 0.18;
       ctx.globalAlpha = alpha;
