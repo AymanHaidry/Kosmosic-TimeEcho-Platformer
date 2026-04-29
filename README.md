@@ -29,7 +29,7 @@ time-echo/
 
 ## 🚀 Quick Start (No Backend)
 
-Open `index.html` directly in any modern browser. The game runs fully offline as a guest — no server needed.
+Open `playground.html` directly in any modern browser. The game runs fully offline as a guest — no server needed.
 
 ---
 
