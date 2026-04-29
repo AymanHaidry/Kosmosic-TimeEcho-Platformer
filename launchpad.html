@@ -3,21 +3,75 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <meta name="theme-color" content="#0a0a1a"/>
+  <meta name="theme-color" content="#08080f"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  
+  <meta name="apple-mobile-web-app-title" content="TimeEcho"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="application-name" content="Time Echo"/>
+
   <title>Time Echo Platformer</title>
   <meta name="description" content="Beat puzzles with your past self. A pixel-art time-echo platformer where you record echoes of yourself to solve puzzles."/>
   <meta name="keywords" content="platformer, puzzle, game, pixel-art, time-travel, echo"/>
-   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2308080f'/%3E%3C!-- helmet --%3E%3Crect x='8' y='3' width='16' height='12' fill='%23005577'/%3E%3Crect x='9' y='2' width='14' height='5' fill='%23006699'/%3E%3C!-- visor --%3E%3Crect x='9' y='6' width='14' height='6' fill='%23001122'/%3E%3Crect x='10' y='7' width='12' height='4' fill='%2300d4ff' opacity='.8'/%3E%3Crect x='18' y='8' width='3' height='2' fill='%23fff'/%3E%3C!-- body --%3E%3Crect x='9' y='14' width='14' height='12' fill='%23004466'/%3E%3Crect x='12' y='15' width='8' height='8' fill='%2300d4ff'/%3E%3Crect x='14' y='17' width='4' height='4' fill='%23fff'/%3E%3Crect x='15' y='18' width='2' height='2' fill='%2300d4ff'/%3E%3C!-- legs --%3E%3Crect x='9' y='25' width='6' height='6' fill='%23004466'/%3E%3Crect x='17' y='25' width='6' height='6' fill='%23004466'/%3E%3C!-- arms --%3E%3Crect x='4' y='15' width='5' height='9' fill='%23003355'/%3E%3Crect x='23' y='15' width='5' height='9' fill='%23003355'/%3E%3C/svg%3E"/>
+
+  <link rel="manifest" href="/manifest.json"/>
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%2308080f'/%3E%3Crect x='48' y='18' width='96' height='72' fill='%23005577'/%3E%3Crect x='54' y='12' width='84' height='30' fill='%23006699'/%3E%3Crect x='54' y='36' width='84' height='36' fill='%23001122'/%3E%3Crect x='60' y='42' width='72' height='24' fill='%2300d4ff' opacity='.8'/%3E%3C/svg%3E"/>
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2308080f'/%3E%3C!-- helmet --%3E%3Crect x='8' y='3' width='16' height='12' fill='%23005577'/%3E%3Crect x='9' y='2' width='14' height='5' fill='%23006699'/%3E%3C!-- visor --%3E%3Crect x='9' y='6' width='14' height='6' fill='%23001122'/%3E%3Crect x='10' y='7' width='12' height='4' fill='%2300d4ff' opacity='.8'/%3E%3Crect x='18' y='8' width='3' height='2' fill='%23fff'/%3E%3C!-- body --%3E%3Crect x='9' y='14' width='14' height='12' fill='%23004466'/%3E%3Crect x='12' y='15' width='8' height='8' fill='%2300d4ff'/%3E%3Crect x='14' y='17' width='4' height='4' fill='%23fff'/%3E%3Crect x='15' y='18' width='2' height='2' fill='%2300d4ff'/%3E%3C!-- legs --%3E%3Crect x='9' y='25' width='6' height='6' fill='%23004466'/%3E%3Crect x='17' y='25' width='6' height='6' fill='%23004466'/%3E%3C!-- arms --%3E%3Crect x='4' y='15' width='5' height='9' fill='%23003355'/%3E%3Crect x='23' y='15' width='5' height='9' fill='%23003355'/%3E%3C/svg%3E"/>
   <link rel="stylesheet" href="style.css"/>
-  
-  <!-- Pixel font preload -->
+
+  <!-- Pixel font -->
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" as="style"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"/>
+
+  <style>
+    /* ── Touch controls: auto-show on touch devices, hide on PC ── */
+    @media (hover: none) and (pointer: coarse) {
+      #touch-controls { display: flex !important; }
+    }
+    /* ── PWA install banner ── */
+    #pwa-banner {
+      display: none;
+      position: fixed;
+      bottom: 60px; left: 50%; transform: translateX(-50%);
+      background: rgba(8,8,15,0.95);
+      border: 2px solid #00d4ff;
+      color: #cfe8ff;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 7px;
+      padding: 12px 18px;
+      gap: 12px;
+      align-items: center;
+      z-index: 9001;
+      box-shadow: 0 0 30px rgba(0,212,255,0.2);
+      max-width: 320px;
+      text-align: center;
+    }
+    #pwa-banner.show { display: flex; flex-direction: column; }
+    #pwa-banner-btns { display: flex; gap: 10px; margin-top: 8px; }
+    #pwa-install-btn {
+      background: rgba(0,212,255,0.15);
+      border: 1px solid #00d4ff;
+      color: #00d4ff;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 6px;
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    #pwa-install-btn:hover { background: rgba(0,212,255,0.3); }
+    #pwa-dismiss-btn {
+      background: transparent;
+      border: 1px solid #2a2a5a;
+      color: #5a7090;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 6px;
+      padding: 7px 14px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
 <div id="app-container">
@@ -50,19 +104,18 @@
 
   <!-- ══ GAME AREA ═════════════════════════════════════ -->
   <main id="main-game">
-    <!-- Canvas for rendering game -->
     <div id="canvas-wrap" role="img" aria-label="Game canvas">
       <canvas id="game-canvas" width="900" height="500" title="Time Echo Game Canvas"></canvas>
     </div>
 
-    <!-- Mobile touch controls -->
+    <!-- Mobile touch controls (auto-shown on touch devices via CSS media query) -->
     <aside id="touch-controls" aria-label="Mobile game controls">
       <div class="touch-dpad" title="Movement controls">
         <button class="touch-btn" id="tc-left" type="button" aria-label="Move left">◀</button>
         <button class="touch-btn" id="tc-right" type="button" aria-label="Move right">▶</button>
       </div>
       <div class="touch-actions" title="Action controls">
-        <button class="touch-btn" id="tc-record" type="button" aria-label="Record echo">●REC</button>
+        <button class="touch-btn rec-btn" id="tc-record" type="button" aria-label="Record echo">●REC</button>
         <button class="touch-btn" id="tc-jump" type="button" aria-label="Jump">▲</button>
       </div>
     </aside>
@@ -87,7 +140,7 @@
         <button class="menu-btn"            onclick="TEP.UI.showHelp()">❓ HOW TO PLAY</button>
     </div>
 
-    <div class="section-title">— SELECT LEVEL —</div>
+    <div class="section-title" id="level-select-title">— SELECT LEVEL —</div>
     <div id="level-grid"></div>
 
     <div style="margin-top:18px;font-family:var(--font-pixel);font-size:7px;color:var(--muted);line-height:2;">
@@ -96,7 +149,6 @@
   </div>
 </div>
 
-<!-- ── AUTH PANEL ─────────────────────────────────── -->
 <!-- ── AUTH PANEL ─────────────────────────────────── -->
 <div class="tep-panel hidden" id="auth-panel">
   <div class="panel-box" style="max-width:420px;">
@@ -108,7 +160,6 @@
       <button class="auth-tab"        id="auth-reg-tab"   onclick="TEP.UI.switchAuthTab('register')">REGISTER</button>
     </div>
 
-    <!-- Login form -->
     <form id="auth-login-form" onsubmit="TEP.UI.handleLogin(event)">
       <div class="field-row">
         <label>EMAIL</label>
@@ -121,7 +172,6 @@
       <button type="submit" class="submit-btn" id="login-btn">LOGIN</button>
     </form>
 
-    <!-- Register form -->
     <form id="auth-reg-form" class="hidden" onsubmit="TEP.UI.handleRegister(event)">
       <div class="field-row">
         <label>USERNAME</label>
@@ -192,14 +242,10 @@
     </div>
     <table class="lb-table">
       <thead>
-        <tr>
-          <th>#</th><th>PLAYER</th><th>SCORE</th><th>TIME</th><th>ECHOES</th>
-        </tr>
+        <tr><th>#</th><th>PLAYER</th><th>SCORE</th><th>TIME</th><th>ECHOES</th></tr>
       </thead>
       <tbody id="lb-body">
-        <tr><td colspan="5" style="color:var(--muted);padding:20px;">
-          Sign in and play to see scores here!
-        </td></tr>
+        <tr><td colspan="5" style="color:var(--muted);padding:20px;">Sign in and play to see scores here!</td></tr>
       </tbody>
     </table>
     <div style="margin-top:16px;text-align:right;">
@@ -245,17 +291,11 @@
       or create stepping stones across gaps.</p>
       <p style="margin-top:10px;color:var(--muted);">
          🫧 <b style="color:#cc44ff">Echo Wisps</b> — corrupt your recording on contact<br/>
-          🤖 <b style="color:#ff8833">Chrono Sentinels</b> — rewind when hit by echoes, enrage after 3 hits<br/>
+          🤖 <b style="color:#ff8833">Chrono Sentinels</b> — rewind when hit by echoes<br/>
           👾 <b style="color:#ff00ff">Paradox Beasts</b> — copy your last echo as a weapon<br/>
           🟢 <b style="color:#44dd22">Temporal Slimes</b> — split into 2 when hit<br/>
           👤 <b style="color:#aa44ff">Void Shades</b> — invisible when you stop recording
       </p>
-    </div>
-    <div style="margin-top:20px;">
-      <div style="font-family:var(--font-pixel);font-size:8px;color:var(--accent2);margin-bottom:10px;">ENEMIES</div>
-      <div style="font-family:var(--font-ui);font-size:14px;color:var(--muted);line-height:1.8;">
-        Beat levels to unlock the shop and earn coins. Register for a free account to save your progress and compete worldwide!
-      </div>
     </div>
     <div style="margin-top:18px;text-align:right;">
       <button class="nav-btn" onclick="TEP.UI.showMenu()">← Back</button>
@@ -265,6 +305,16 @@
 
 </div><!-- End panels-container -->
 
+<!-- ══ PWA INSTALL BANNER ════════════════════════════ -->
+<div id="pwa-banner">
+  <div>📲 INSTALL TIME ECHO</div>
+  <div style="color:#5a7090;font-size:6px;margin-top:4px">Play offline · Full screen · No browser UI</div>
+  <div id="pwa-banner-btns">
+    <button id="pwa-install-btn" type="button">INSTALL APP</button>
+    <button id="pwa-dismiss-btn" type="button">LATER</button>
+  </div>
+</div>
+
 <!-- ══ TOAST ══════════════════════════════════════════ -->
 <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
@@ -272,8 +322,6 @@
 <footer id="site-footer" role="contentinfo">
   <div class="footer-content">
     <p><strong>TIME ECHO PLATFORMER</strong> — Beat puzzles with your past self.</p>
-    <p>Made with pixels &amp; paradoxes | 
-    </p>
   </div>
 </footer>
 
@@ -290,104 +338,101 @@
 <script src="game.js"></script>
 <script src="ui.js"></script>
 
-<!-- Fallback: ensure levels are loaded -->
 <script>
-// If levels.js didn't load properly, attempt to load it again
-(function() {
-  if (!window.TEP?.LEVELS) {
-    console.warn('Levels not loaded, attempting fallback...');
-    const script = document.createElement('script');
-    script.src = 'levels.js?t=' + Date.now();
-    script.onload = function() {
-      console.log('Levels loaded via fallback. Count:', window.TEP?.LEVELS?.length || 0);
-      // Force UI to update if needed
-      if (window.TEP?.UI?.showMenu) {
-        console.log('Updating menu...');
-      }
-    };
-    script.onerror = function() {
-      console.error('Failed to load levels.js');
-    };
-    document.head.appendChild(script);
+// ── PWA: Register Service Worker ────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('[PWA] SW registered:', reg.scope))
+      .catch(err => console.warn('[PWA] SW failed:', err));
+  });
+}
+
+// ── PWA: Install prompt ─────────────────────────────
+let _pwaPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  _pwaPrompt = e;
+  // Show banner only if not already dismissed
+  if (!localStorage.getItem('tep_pwa_dismissed')) {
+    setTimeout(() => {
+      document.getElementById('pwa-banner')?.classList.add('show');
+    }, 8000); // show after 8s of play
   }
-})();
+});
+document.getElementById('pwa-install-btn')?.addEventListener('click', () => {
+  if (_pwaPrompt) {
+    _pwaPrompt.prompt();
+    _pwaPrompt.userChoice.then(() => {
+      document.getElementById('pwa-banner')?.classList.remove('show');
+      _pwaPrompt = null;
+    });
+  }
+});
+document.getElementById('pwa-dismiss-btn')?.addEventListener('click', () => {
+  document.getElementById('pwa-banner')?.classList.remove('show');
+  localStorage.setItem('tep_pwa_dismissed', '1');
+});
+
+// ── Mobile: hook touch controls ─────────────────────
+function hookTouch(id, key) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('touchstart', e => { e.preventDefault(); TEP.Game.keys[key] = true; }, { passive: false });
+  el.addEventListener('touchend',   () => { TEP.Game.keys[key] = false; });
+  el.addEventListener('touchcancel',() => { TEP.Game.keys[key] = false; });
+}
+hookTouch('tc-left',  'arrowleft');
+hookTouch('tc-right', 'arrowright');
+hookTouch('tc-jump',  ' ');
+const recBtn = document.getElementById('tc-record');
+if (recBtn) {
+  recBtn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'e' }));
+    setTimeout(() => window.dispatchEvent(new KeyboardEvent('keyup', { key: 'e' })), 80);
+  }, { passive: false });
+}
+
+// ── Keyboard shortcut while playing ─────────────────
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && TEP.Game.getState() === 'menu') TEP.UI.hideAll();
+});
 </script>
 
 <script>
 /* ── Bootstrap ─────────────────────────────────── */
 (async () => {
   const canvas = document.getElementById('game-canvas');
-  
-  // FALLBACK: If levels not loaded, load them now
+
   if (!window.TEP?.LEVELS) {
-    console.log('Loading levels from bootstrap...');
     try {
-      const levelsResponse = await fetch('levels.js');
-      const levelsCode = await levelsResponse.text();
-      // Make sure TEP is in scope for eval
+      const r = await fetch('levels.js');
+      const code = await r.text();
       const TEP = window.TEP;
-      eval(levelsCode);
-      console.log('Levels loaded. Count:', TEP?.LEVELS?.length || 0);
-    } catch (e) {
+      eval(code);
+    } catch(e) {
       console.error('Failed to load levels:', e);
-      // Set a minimal level array so the game doesn't crash
       TEP.LEVELS = [];
     }
   }
 
-  // Init Sound (optional)
   if (window.TEP?.Sound?.init) {
     try { TEP.Sound.init(); } catch(e) { console.warn('Sound init failed', e); }
   }
 
-  // Init Auth (try restore session)
   const restored = await TEP.Auth.init();
   if (!restored) TEP.Auth.initGuest();
 
-  // Init game engine
   TEP.Game.init(canvas);
-
-  // Show main menu
   TEP.UI.showMenu();
   TEP.UI.updateNavBar();
 
-  // Logout
   document.getElementById('logout-btn').addEventListener('click', async () => {
     await TEP.Auth.logout();
     TEP.UI.updateNavBar();
     TEP.UI.showMenu();
     TEP.UI.showToast('👋 Logged out');
-  });
-
-  // ── Mobile touch controls ────────────────────────
-  function hookTouch(id, key) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.addEventListener('touchstart', e => {
-      e.preventDefault();
-      TEP.Game.keys[key] = true;
-    }, { passive: false });
-    el.addEventListener('touchend', () => { TEP.Game.keys[key] = false; });
-  }
-  hookTouch('tc-left',   'arrowleft');
-  hookTouch('tc-right',  'arrowright');
-  hookTouch('tc-jump',   ' ');
-  const recBtn = document.getElementById('tc-record');
-  if (recBtn) {
-    recBtn.addEventListener('touchstart', e => {
-      e.preventDefault();
-      // Simulate E keypress
-      const ev = new KeyboardEvent('keydown', { key: 'e' });
-      window.dispatchEvent(ev);
-      setTimeout(() => window.dispatchEvent(new KeyboardEvent('keyup', { key: 'e' })), 80);
-    }, { passive: false });
-  }
-
-  // ── Keyboard shortcut while playing ─────────────
-  window.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && TEP.Game.getState() === 'menu') {
-      TEP.UI.hideAll();
-    }
   });
 })();
 </script>
