@@ -113,7 +113,7 @@ TEP.Auth = (() => {
   try {
     // If it's not an email → treat as username
     if (!identifier.includes('@')) {
-      const { data: userRow, error } = await TEP.DB.getUserByUsername(identifier);
+      const userRow = await TEP.DB.getUserByUsername(identifier);
 
       if (!userRow || !userRow.email) {
         return { ok: false, msg: 'User not found' };
