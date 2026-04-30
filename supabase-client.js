@@ -53,20 +53,35 @@ TEP.DB = (() => {
   }
 
   return {
-    setToken(tok) { accessToken = tok || SUPABASE_ANON; },
+  setToken(tok) { accessToken = tok || SUPABASE_ANON; },
 
-    // Auth
-    async signUp(email, password)  { return authFetch('signup', { email, password }); },
-    async signIn(email, password)  { return authFetch('token?grant_type=password', { email, password }); },
-    async signOut(token) {
-      try {
-        await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
-          method: 'POST',
-          headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${token}` },
-        });
-      } catch(e) {}
-    },
+  // Auth
+  async getUserByUsername(username) {
+    return await this.select(
+      'profiles',
+      `username=ilike.${encodeURIComponent(username)}&select=email`
+    ).then(rows => rows?.[0] || null);
+  }, // ✅ COMMA HERE
 
+  async signUp(email, password)  { 
+    return authFetch('signup', { email, password }); 
+  },
+
+  async signIn(email, password)  { 
+    return authFetch('token?grant_type=password', { email, password }); 
+  },
+
+  async signOut(token) {
+    try {
+      await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
+        method: 'POST',
+        headers: { 
+          'apikey': SUPABASE_ANON, 
+          'Authorization': `Bearer ${token}` 
+        },
+      });
+    } catch(e) {}
+  },
     // REST helpers
     async select(table, query = '') {
       return restFetch(`${table}${query ? '?' + query : ''}`);
