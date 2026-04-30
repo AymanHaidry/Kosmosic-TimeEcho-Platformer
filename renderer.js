@@ -124,31 +124,40 @@ TEP.Renderer = (() => {
   
 
    // ── Lava ──────────────────────────────────────────
-  // Drawn SEPARATELY, called after platforms, never treated as platform
   function drawLava(lv, camX, camY) {
-    const sx = px(lv.x - camX), sy = py(lv.y - camY);
-    if (sx + lv.w < -10 || sx > W || sy + lv.h < -10 || sy > H) return;
+  const sx = px(lv.x - camX), sy = py(lv.y - camY);
+  if (sx + lv.w < -10 || sx > W || sy + lv.h < -10 || sy > H) return;
 
-    // Base dark
-    ctx.fillStyle = '#7a1a00';
-    ctx.fillRect(sx, sy, lv.w, lv.h);
-    // Mid layer
-    ctx.fillStyle = '#cc3300';
-    ctx.fillRect(sx, sy + 4, lv.w, lv.h - 4);
-    // Bright orange
-    ctx.fillStyle = '#ff5500';
-    ctx.fillRect(sx, sy, lv.w, 4);
-    // Animated surface wave
-    const t = Date.now() * 0.004;
-    ctx.fillStyle = '#ff8833';
-    for (let x = 0; x < lv.w; x += 6) {
-      const h2 = 2 + Math.sin(t + x * 0.15) * 1.5;
-      ctx.fillRect(sx + x, sy, Math.min(4, lv.w - x), Math.ceil(h2));
-    }
-    // Glow underneath — simple, no blur
-    ctx.fillStyle = 'rgba(255,60,0,0.12)';
-    ctx.fillRect(sx, sy + lv.h, lv.w, 8);
+  const t = Date.now() * 0.005;
+  const pulse = 0.5 + Math.sin(t) * 0.5; // 0 → 1 glow strength
+
+  // Base dark
+  ctx.fillStyle = '#7a1a00';
+  ctx.fillRect(sx, sy, lv.w, lv.h);
+
+  // 🔥 GLOW LAYER (NEW)
+  ctx.fillStyle = `rgba(255, 80, 0, ${0.15 + pulse * 0.15})`;
+  ctx.fillRect(sx - 4, sy - 2, lv.w + 8, lv.h + 6);
+
+  // Mid layer
+  ctx.fillStyle = '#cc3300';
+  ctx.fillRect(sx, sy + 4, lv.w, lv.h - 4);
+
+  // Bright orange top
+  ctx.fillStyle = '#ff5500';
+  ctx.fillRect(sx, sy, lv.w, 4);
+
+  // Animated surface wave
+  ctx.fillStyle = '#ff8833';
+  for (let x = 0; x < lv.w; x += 6) {
+    const h2 = 2 + Math.sin(t * 2 + x * 0.15) * 1.5;
+    ctx.fillRect(sx + x, sy, Math.min(4, lv.w - x), Math.ceil(h2));
   }
+
+  // Bottom heat glow (enhanced)
+  ctx.fillStyle = `rgba(255,60,0,${0.10 + pulse * 0.08})`;
+  ctx.fillRect(sx, sy + lv.h, lv.w, 10);
+}
 
   // ── Spike ─────────────────────────────────────────
   function drawSpike(s, camX, camY) {
