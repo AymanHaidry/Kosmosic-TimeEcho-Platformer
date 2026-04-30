@@ -128,35 +128,36 @@ TEP.Renderer = (() => {
   const sx = px(lv.x - camX), sy = py(lv.y - camY);
   if (sx + lv.w < -10 || sx > W || sy + lv.h < -10 || sy > H) return;
 
-  const t = Date.now() * 0.005;
-  const pulse = 0.5 + Math.sin(t) * 0.5; // 0 → 1 glow strength
+  const t = Date.now() * 0.006;
+  const pulse = 0.5 + Math.sin(t * 2) * 0.5;
 
-  // Base dark
-  ctx.fillStyle = '#7a1a00';
+  // ── CORE BODY ──
+  ctx.fillStyle = '#6a1200';
   ctx.fillRect(sx, sy, lv.w, lv.h);
 
-  // 🔥 GLOW LAYER (NEW)
-  ctx.fillStyle = `rgba(255, 80, 0, ${0.15 + pulse * 0.15})`;
-  ctx.fillRect(sx - 4, sy - 2, lv.w + 8, lv.h + 6);
+  ctx.fillStyle = '#cc2a00';
+  ctx.fillRect(sx, sy + 3, lv.w, lv.h - 3);
 
-  // Mid layer
-  ctx.fillStyle = '#cc3300';
-  ctx.fillRect(sx, sy + 4, lv.w, lv.h - 4);
+  ctx.fillStyle = '#ff4a00';
+  ctx.fillRect(sx, sy, lv.w, 3);
 
-  // Bright orange top
-  ctx.fillStyle = '#ff5500';
-  ctx.fillRect(sx, sy, lv.w, 4);
-
-  // Animated surface wave
-  ctx.fillStyle = '#ff8833';
+  // ── HOT SURFACE WAVES ──
+  ctx.fillStyle = '#ff7a1a';
   for (let x = 0; x < lv.w; x += 6) {
-    const h2 = 2 + Math.sin(t * 2 + x * 0.15) * 1.5;
-    ctx.fillRect(sx + x, sy, Math.min(4, lv.w - x), Math.ceil(h2));
+    const wave = Math.sin(t * 2 + x * 0.18) * 2;
+    ctx.fillRect(sx + x, sy + wave, 4, 3);
   }
 
-  // Bottom heat glow (enhanced)
-  ctx.fillStyle = `rgba(255,60,0,${0.10 + pulse * 0.08})`;
-  ctx.fillRect(sx, sy + lv.h, lv.w, 10);
+  // ── 🔥 STRONG GLOW (MAIN FIX) ──
+  ctx.fillStyle = `rgba(255, 80, 0, ${0.25 + pulse * 0.25})`;
+  ctx.fillRect(sx - 6, sy - 3, lv.w + 12, lv.h + 8);
+
+  ctx.fillStyle = `rgba(255, 40, 0, ${0.15 + pulse * 0.2})`;
+  ctx.fillRect(sx - 10, sy - 6, lv.w + 20, lv.h + 14);
+
+  // ── UNDER GLOW ──
+  ctx.fillStyle = `rgba(255, 120, 0, ${0.15 + pulse * 0.1})`;
+  ctx.fillRect(sx, sy + lv.h, lv.w, 14);
 }
 
   // ── Spike ─────────────────────────────────────────
