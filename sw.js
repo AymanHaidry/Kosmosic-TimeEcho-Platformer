@@ -9,7 +9,7 @@ const STATIC_CACHE = 'time-echo-static-v1';
 
 // Core files to cache on install
 const PRECACHE = [
-  '/launchpad.html',
+  '/launchpad',
   '/style.css',
   '/config.js',
   '/supabase-client.js',
@@ -75,7 +75,7 @@ self.addEventListener('fetch', (event) => {
       }).catch(() => {
         // Offline fallback for navigation requests
         if (event.request.mode === 'navigate') {
-          return caches.match('/launchpad.html');
+          return caches.match('/launchpad');
         }
       });
     })

@@ -125,7 +125,7 @@ TEP.LEVELS = [
 // ━━ LEVEL 3 — "Wisp Woods" ━━ EchoWisps introduced, night
 {
   num:3, name:'Wisp Woods',
-  theme:'haunted_forest', isNight:true,
+  theme:'haunted_forest', isNight:false,
   worldW:2800, worldH:600,
   start:[60,500], goalPos:[2720,440],
   platforms:[
@@ -170,7 +170,7 @@ TEP.LEVELS = [
 // ━━ LEVEL 4 — "Laser Labyrinth" ━━ lasers + wisps + slimes
 {
   num:4, name:'Laser Labyrinth',
-  theme:'crystal_sky', isNight:true,
+  theme:'crystal_sky', isNight:false,
   worldW:3000, worldH:640,
   start:[60,560], goalPos:[2920,500],
   platforms:[
@@ -219,7 +219,7 @@ TEP.LEVELS = [
 // ━━ LEVEL 5 — "Sentinel Station" ━━ Chrono Sentinels
 {
   num:5, name:'Sentinel Station',
-  theme:'neon_city', isNight:true,
+  theme:'neon_city', isNight:false,
   worldW:3200, worldH:600,
   start:[60,500], goalPos:[3120,420],
   platforms:[
@@ -406,7 +406,7 @@ TEP.LEVELS = [
 // ━━ LEVEL 9 — "Void Stalker" ━━ VoidShades introduced, night
 {
   num:9, name:'Void Stalker',
-  theme:'paradox_void', isNight:true,
+  theme:'paradox_void', isNight:false,
   worldW:3400, worldH:620,
   start:[60,540], goalPos:[3320,460],
   platforms:[
@@ -452,7 +452,7 @@ TEP.LEVELS = [
 // ━━ LEVEL 10 — "Paradox Nexus" ━━ all enemy types, night
 {
   num:10, name:'Paradox Nexus',
-  theme:'paradox_void', isNight:true,
+  theme:'paradox_void', isNight:false,
   worldW:4000, worldH:640,
   start:[60,560], goalPos:[3920,460],
   platforms:[
