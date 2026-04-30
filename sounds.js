@@ -33,7 +33,9 @@ TEP.Sound = (() => {
 
     // resume custom music
     if (bgmAudio && bgmAudio.paused) {
-      bgmAudio.play().catch(() => {});
+      bgmAudio.play().catch(err => {
+  console.log("🔥 BGM PLAY ERROR:", err);
+});
     }
   }
 
