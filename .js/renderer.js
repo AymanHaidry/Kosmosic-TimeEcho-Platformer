@@ -121,67 +121,7 @@ TEP.Renderer = (() => {
     }
   }
 
-  
-   // ── Night glow (TORCHLIGHT) ─────────────────────────
-  function updateNightGlow() {
-    const isNight = level.isNight || C.THEMES[level.theme]?.isNight;
-    targetNightGlow = isNight ? 190 : 0;
-    nightGlowRadius += (targetNightGlow - nightGlowRadius) * 0.04;
-  }
-
-  // ── Torchlight overlay ─────────────────────────────
-  function drawNightGlow() {
-    if (nightGlowRadius < 5) return;
-    const sx = player.x - camX + 11;
-    const sy = player.y - camY + 19;
-
-    // Heavy darkness — more cave-like than before
-    ctx.save();
-    ctx.globalCompositeOperation = 'multiply';
-    ctx.fillStyle = 'rgba(0,0,8,0.92)';
-    ctx.fillRect(0, 0, W, H);
-    ctx.restore();
-
-    // Warm torchlight — amber core fading to dark red edge
-    ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
-    const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, nightGlowRadius);
-    g.addColorStop(0,    'rgba(255, 228, 140, 0.92)'); // bright warm white-yellow
-    g.addColorStop(0.12, 'rgba(255, 180,  60, 0.70)'); // orange inner
-    g.addColorStop(0.35, 'rgba(220,  90,  10, 0.38)'); // burnt orange mid
-    g.addColorStop(0.60, 'rgba(140,  30,   0, 0.16)'); // deep red outer
-    g.addColorStop(0.85, 'rgba( 60,   5,   0, 0.06)'); // near-black rim
-    g.addColorStop(1,    'rgba(  0,   0,   0, 0.00)'); // transparent edge
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.arc(sx, sy, nightGlowRadius, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Subtle flicker — tiny random brightness pulse
-    const flicker = 0.92 + Math.random() * 0.08;
-    const fg = ctx.createRadialGradient(sx, sy, 0, sx, sy, nightGlowRadius * 0.25);
-    fg.addColorStop(0,   `rgba(255, 240, 180, ${0.18 * flicker})`);
-    fg.addColorStop(1,   'rgba(0,0,0,0)');
-    ctx.fillStyle = fg;
-    ctx.beginPath();
-    ctx.arc(sx, sy, nightGlowRadius * 0.25, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-
-    // Pet glow (star jelly only)
-    const pet = TEP.Auth.getPet?.();
-    if (pet === 'star_jellyfish') {
-      ctx.save();
-      ctx.globalCompositeOperation = 'lighter';
-      const pg = ctx.createRadialGradient(sx + 32, sy - 10, 0, sx + 32, sy - 10, 55);
-      pg.addColorStop(0, 'rgba(180, 80, 255, 0.35)');
-      pg.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = pg;
-      ctx.beginPath(); ctx.arc(sx + 32, sy - 10, 55, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
-    }
-  }
-   // ── Lava ──────────────────────────────────────────
+  // ── Lava ──────────────────────────────────────────
   // Drawn SEPARATELY, called after platforms, never treated as platform
   function drawLava(lv, camX, camY) {
     const sx = px(lv.x - camX), sy = py(lv.y - camY);
@@ -208,7 +148,75 @@ TEP.Renderer = (() => {
     ctx.fillRect(sx, sy + lv.h, lv.w, 8);
   }
 
-  // ── Spike ─────────────────────────────────────────
+  // ── Torchlight night overlay ──────────────────────
+  // Two-pass technique: darkness mask punched by a light hole.
+  // Result: world is visible only within torch radius; everything else pitch-dark.
+  // Color is ALWAYS warm amber — NOT player skin color.
+  function drawTorchlight(playerX, playerY, camX, camY, radius) {
+    if (radius < 5) return;
+    const cx = px(playerX - camX) + 11;
+    const cy = py(playerY - camY) + 30; // torch at player chest/feet level
+
+    // ── PASS 1: paint darkness, then erase (destination-out) the torch hole ──
+    // Save entire canvas state
+    ctx.save();
+
+    // Darkness overlay
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = 'rgba(1,1,6,0.93)';
+    ctx.fillRect(0, 0, W, H);
+
+    // Erase the lit area using destination-out
+    ctx.globalCompositeOperation = 'destination-out';
+
+    // Elliptical torch shape: wider than tall (light spreads sideways more than up/down)
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(1.40, 0.82); // wider ellipse
+    const hole = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
+    hole.addColorStop(0,    'rgba(255,255,255,1.00)');
+    hole.addColorStop(0.30, 'rgba(255,255,255,0.95)');
+    hole.addColorStop(0.55, 'rgba(255,255,255,0.75)');
+    hole.addColorStop(0.75, 'rgba(255,255,255,0.40)');
+    hole.addColorStop(0.88, 'rgba(255,255,255,0.15)');
+    hole.addColorStop(1.00, 'rgba(255,255,255,0.00)');
+    ctx.fillStyle = hole;
+    ctx.beginPath(); ctx.arc(0, 0, radius, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+
+    ctx.restore(); // restore composite mode
+
+    // ── PASS 2: warm amber tint over the lit area ──
+    // Adds warmth without re-darkening — purely additive feel
+    ctx.save();
+    ctx.globalCompositeOperation = 'source-over';
+
+    const flicker = 0.90 + Math.random() * 0.10;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(1.35, 0.80);
+    const warm = ctx.createRadialGradient(0, 0, 0, 0, 0, radius * 0.90);
+    warm.addColorStop(0,    `rgba(255, 200,  80, ${0.22 * flicker})`);
+    warm.addColorStop(0.25, `rgba(255, 140,  40, ${0.20 * flicker})`);
+    warm.addColorStop(0.55, `rgba(220,  80,  10, ${0.13 * flicker})`);
+    warm.addColorStop(0.80, `rgba(140,  30,   0, ${0.06 * flicker})`);
+    warm.addColorStop(1,    'rgba(0,0,0,0)');
+    ctx.fillStyle = warm;
+    ctx.beginPath(); ctx.arc(0, 0, radius * 0.90, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+
+    // Tiny bright hot core
+    const core = ctx.createRadialGradient(cx, cy - 6, 0, cx, cy - 6, radius * 0.09);
+    core.addColorStop(0, `rgba(255,240,200,${0.40 * flicker})`);
+    core.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = core;
+    ctx.beginPath(); ctx.arc(cx, cy - 6, radius * 0.09, 0, Math.PI * 2); ctx.fill();
+
+    ctx.restore();
+  }
+
+
   function drawSpike(s, camX, camY) {
     const sx = px(s.x - camX), sy = py(s.y - camY);
     if (sx + s.w < 0 || sx > W) return;
@@ -363,13 +371,13 @@ TEP.Renderer = (() => {
 
   // ── ECHONAUT — new original design ───────────────
   // A sleek humanoid in a tight suit with a helmet visor and no scarf
-  function drawEchonaut(sx, sy, color, facingRight, frame, alpha, isMoving) {
+  function drawEchonaut(sx, sy, color, facingRight, frame, alpha) {
     ctx.globalAlpha = alpha;
     const f = frame;
 
-    // Walk cycle — only animate when moving
-    const legSwing = (isMoving !== false) ? Math.sin(f * 0.28) * 5 : 0;
-    const armSwing = (isMoving !== false) ? Math.sin(f * 0.28) * 4 : 0;
+    // Walk cycle
+    const legSwing = Math.sin(f * 0.28) * 5;
+    const armSwing = Math.sin(f * 0.28) * 4;
 
     // ── LEGS ──
     // Left leg
@@ -462,18 +470,17 @@ TEP.Renderer = (() => {
     const sx = px(actor.x - camX);
     const sy = py(actor.y - camY);
     if (sx + actor.w < -10 || sx > W + 10) return;
-    if (!actor.isGhost) _walkFrame++;
-    drawEchonaut(sx, sy, actor.color || '#00d4ff', actor.facingRight, actor.isGhost ? 0 : _walkFrame, alpha);
+    const isMoving = Math.abs(actor.vx) > 0.3 || !actor.onGround;
+    if (!actor.isGhost && isMoving) _walkFrame++;
+    drawEchonaut(sx, sy, actor.color || '#00d4ff', actor.facingRight, isMoving ? _walkFrame : 0, alpha);
   }
 
- function drawActorTrail(actor, camX, camY, color) {
+  function drawActorTrail(actor, camX, camY, color) {
     const trail = actor.trail || [];
-    // Only draw trail when the actor is meaningfully moving
-    const isMoving = Math.abs(actor.vx) > 0.4 || Math.abs(actor.vy) > 1.0;
-    if (!isMoving || trail.length < 3) return;
- 
+    const isMoving = Math.abs(actor.vx) > 0.5 || Math.abs(actor.vy) > 1.5;
+    if (!isMoving || trail.length < 4) return;
     for (let i = 0; i < trail.length; i++) {
-      const alpha = (i / trail.length) * 0.18;
+      const alpha = (i / trail.length) * 0.15;
       ctx.globalAlpha = alpha;
       ctx.fillStyle = color;
       const sx2 = trail[i].x - camX + actor.w / 2 - 3;
@@ -515,40 +522,42 @@ TEP.Renderer = (() => {
     ctx.fillRect(sx - 1, sy - 6, Math.floor((actor.w + 2) * t), 3);
   }
 
-  // ── Pet pixel drawing ─────────────────────────────
-  // Each pet is drawn as actual pixel art, not emoji
+  // ── Pet pixel drawing — at player's LEFT foot (observer left) ────
   let _petFrame = 0;
-  function drawPet(petId, playerX, playerY, camX, camY) {
+  function drawPet(petId, playerX, playerY, playerVx, playerVy, camX, camY) {
     if (!petId || petId === 'none') return;
     const petDef = C.PETS?.find(p => p.id === petId);
     if (!petDef) return;
-    _petFrame++;
-
-    const sx = px(playerX - camX) + 28;  // right of player
-    const sy = py(playerY - camY) + 8;
+    
+    const isMoving = Math.abs(playerVx) > 0.3 || Math.abs(playerVy) > 1.5;
+    if (isMoving) _petFrame++;
     const t = _petFrame;
 
-    // Bob animation
-    const bob = Math.sin(t * 0.08) * 3;
+    // LEFT foot of Echonaut = observer's left side
+    // Player left foot is at sx+3 (left leg x), sy+36 (bottom of boot)
+    // Position pet to the left of the left leg, at foot level
+    const sx = px(playerX - camX) - 24; // 24px left of player left edge
+    const sy = py(playerY - camY) + 20; // at waist/hip height beside player
+
+    const bob = isMoving ? Math.sin(t * 0.14) * 2 : 0;
 
     ctx.save();
     ctx.imageSmoothingEnabled = false;
 
     switch (petId) {
-      case 'chrono_cat':    _drawPixelCat(ctx, sx, sy + bob, t, petDef.color); break;
-      case 'paradox_pup':   _drawPixelDog(ctx, sx, sy + bob, t, petDef.color); break;
-      case 'wisp_bird':     _drawPixelBird(ctx, sx, sy + bob, t, petDef.color); break;
-      case 'copper_golem':  _drawPixelGolem(ctx, sx, sy + bob, t, petDef.color); break;
-      case 'phantom_fox':   _drawPixelFox(ctx, sx, sy + bob, t, petDef.color); break;
-      case 'star_jellyfish':_drawPixelJelly(ctx, sx, sy + bob, t, petDef.color); break;
-      case 'time_ferret':   _drawPixelFerret(ctx, sx, sy + bob, t, petDef.color); break;
-      case 'echo_sprite':   _drawPixelSprite(ctx, sx, sy + bob, t, petDef.color); break;
-      case 'shadow_wolf':   _drawPixelWolf(ctx, sx, sy + bob, t, petDef.color); break;
-      case 'time_turtle':   _drawPixelTurtle(ctx, sx, sy + bob, t, petDef.color); break;
-      case 'neon_butterfly':_drawPixelButterfly(ctx, sx, sy + bob, t, petDef.color); break;
-      case 'chrono_crab':   _drawPixelCrab(ctx, sx, sy + bob, t, petDef.color); break;
+      case 'chrono_cat':    _drawPixelCat(ctx, sx, sy + bob, isMoving ? t : 0, petDef.color); break;
+      case 'paradox_pup':   _drawPixelDog(ctx, sx, sy + bob, isMoving ? t : 0, petDef.color); break;
+      case 'wisp_bird':     _drawPixelBird(ctx, sx, sy + bob - 8, isMoving ? t : 0, petDef.color); break;
+      case 'copper_golem':  _drawPixelGolem(ctx, sx, sy + bob, isMoving ? t : 0, petDef.color); break;
+      case 'phantom_fox':   _drawPixelFox(ctx, sx, sy + bob, isMoving ? t : 0, petDef.color); break;
+      case 'star_jellyfish':_drawPixelJelly(ctx, sx, sy + bob - 10, isMoving ? t : 0, petDef.color); break;
+      case 'time_ferret':   _drawPixelFerret(ctx, sx, sy + bob, isMoving ? t : 0, petDef.color); break;
+      case 'echo_sprite':   _drawPixelSprite(ctx, sx, sy + bob - 8, isMoving ? t : 0, petDef.color); break;
+      case 'shadow_wolf':   _drawPixelWolf(ctx, sx, sy + bob, isMoving ? t : 0, petDef.color); break;
+      case 'time_turtle':   _drawPixelTurtle(ctx, sx, sy + bob, isMoving ? t : 0, petDef.color); break;
+      case 'neon_butterfly':_drawPixelButterfly(ctx, sx, sy + bob - 6, isMoving ? t : 0, petDef.color); break;
+      case 'chrono_crab':   _drawPixelCrab(ctx, sx, sy + bob + 4, isMoving ? t : 0, petDef.color); break;
       default:
-        // Fallback: coloured square with initial
         ctx.fillStyle = petDef.color;
         ctx.fillRect(sx, sy, 16, 16);
     }
@@ -1038,9 +1047,9 @@ TEP.Renderer = (() => {
     drawActorTrail(player, camX, camY, outfit?.color||'#00d4ff');
     drawActor(player, camX, camY, player.dead?0.3:1);
 
-    // Pet
+    // Pet — at player's left foot
     const petId = TEP.Auth.getPet?.();
-    if (petId && petId !== 'none') drawPet(petId, player.x, player.y, camX, camY);
+    if (petId && petId !== 'none') drawPet(petId, player.x, player.y, player.vx, player.vy, camX, camY);
 
     drawParticles(camX, camY);
     drawFlash();

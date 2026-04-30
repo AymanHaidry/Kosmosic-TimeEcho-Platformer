@@ -107,25 +107,67 @@ TEP.Auth = (() => {
       return { ok: true };
     },
 
-    async login(email, password) {
-      const data = await TEP.DB.signIn(email, password);
-      if (!data) return { ok: false, msg: 'Login failed' };
-      if (data?.error) return { ok: false, msg: data.error_description || data.error };
+    async login(identifier, password) {
+  let email = identifier;
 
-      // normalize response shapes
-      const user = data.user || data?.data?.user || data?.data?.session?.user || null;
-      const token = data.access_token || data.accessToken || data?.data?.access_token || data?.data?.session?.access_token || null;
-      if (!user && !token) return { ok: false, msg: 'Login failed' };
+  try {
+    // If it's not an email → treat as username
+    if (!identifier.includes('@')) {
+      const { data: userRow, error } = await TEP.DB.getUserByUsername(identifier);
 
-      _user = user || (data.user || null);
-      _token = token || null;
-      TEP.DB.setToken(_token);
-      saveSession({ user: _user, access_token: _token });
+      if (error || !userRow) {
+        return { ok: false, msg: 'User not found' };
+      }
 
-      await fetchProfile(_user?.id);
-      if (!_profile && _user) await createProfile(_user.id, email.split('@')[0]);
-      return { ok: true };
-    },
+      email = userRow.email;
+    }
+
+    // Normal email login
+    const data = await TEP.DB.signIn(email, password);
+
+    if (!data) return { ok: false, msg: 'Login failed' };
+    if (data?.error) {
+      return { ok: false, msg: data.error_description || data.error };
+    }
+
+    // Normalize response
+    const user =
+      data.user ||
+      data?.data?.user ||
+      data?.data?.session?.user ||
+      null;
+
+    const token =
+      data.access_token ||
+      data.accessToken ||
+      data?.data?.access_token ||
+      data?.data?.session?.access_token ||
+      null;
+
+    if (!user && !token) {
+      return { ok: false, msg: 'Login failed' };
+    }
+
+    // Save session
+    _user = user;
+    _token = token;
+
+    TEP.DB.setToken(_token);
+    saveSession({ user: _user, access_token: _token });
+
+    // Ensure profile exists
+    await fetchProfile(_user?.id);
+    if (!_profile && _user) {
+      await createProfile(_user.id, email.split('@')[0]);
+    }
+
+    return { ok: true };
+
+  } catch (err) {
+    console.error(err);
+    return { ok: false, msg: 'Unexpected error' };
+  }
+},
 
     async logout() {
       if (_token) await TEP.DB.signOut(_token);

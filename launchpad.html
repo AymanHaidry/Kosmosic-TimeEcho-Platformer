@@ -29,6 +29,26 @@
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script>
+document.addEventListener('click', () => {
+  if (!window.__bgmStarted) {
+    window.__bgmStarted = true;
+
+    const audio = new Audio('time-capsule.mp3');
+    audio.loop = true;
+    audio.volume = 0.5;
+
+    audio.play().then(() => {
+      console.log("✅ BGM started");
+    }).catch(err => {
+      console.log("❌ BGM blocked:", err);
+    });
+
+    // optional: store globally so you can control later
+    window.__bgm = audio;
+  }
+}, { once: true });
+</script>
 
   <style>
     /* ── Touch controls: auto-show on touch devices, hide on PC ── */

@@ -103,32 +103,45 @@ TEP.UI = (() => {
     const el = document.getElementById('level-select-title') || document.getElementById('level-grid');
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
-
+   
   // ── Auth panel ─────────────────────────────────────
-  function showAuth(tab = 'login') {
-    showPanel('auth-panel');
-    switchAuthTab(tab);
-  }
+function showAuth(tab = 'login') {
+  showPanel('auth-panel');
+  switchAuthTab(tab);
+}
 
-  function switchAuthTab(tab) {
-    document.getElementById('auth-login-tab').classList.toggle('active', tab === 'login');
-    document.getElementById('auth-reg-tab').classList.toggle('active',   tab === 'register');
-    document.getElementById('auth-login-form').classList.toggle('hidden', tab !== 'login');
-    document.getElementById('auth-reg-form').classList.toggle('hidden',   tab !== 'register');
-    document.getElementById('auth-err').textContent = '';
-  }
+function switchAuthTab(tab) {
+  document.getElementById('auth-login-tab').classList.toggle('active', tab === 'login');
+  document.getElementById('auth-reg-tab').classList.toggle('active',   tab === 'register');
+  document.getElementById('auth-login-form').classList.toggle('hidden', tab !== 'login');
+  document.getElementById('auth-reg-form').classList.toggle('hidden',   tab !== 'register');
+  document.getElementById('auth-err').textContent = '';
+}
 
-  async function handleLogin(e) {
-    e.preventDefault();
-    const email = document.getElementById('login-email').value.trim();
-    const pass  = document.getElementById('login-pass').value;
-    const btn   = document.getElementById('login-btn');
-    btn.disabled = true; btn.textContent = 'Logging in…';
-    const res = await TEP.Auth.login(email, pass);
-    btn.disabled = false; btn.textContent = 'LOGIN';
-    if (res.ok) { hideAll(); updateNavBar(); showToast('👋 Welcome back, ' + TEP.Auth.getUsername()); showMenu(); }
-    else document.getElementById('auth-err').textContent = res.msg;
+async function handleLogin(e) {
+  e.preventDefault();
+
+  const identifier = document.getElementById('login-identifier').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  const btn   = document.getElementById('login-btn');
+
+  btn.disabled = true;
+  btn.textContent = 'Logging in…';
+
+  const res = await TEP.Auth.login(identifier, pass);
+
+  btn.disabled = false;
+  btn.textContent = 'LOGIN';
+
+  if (res.ok) {
+    hideAll();
+    updateNavBar();
+    showToast('👋 Welcome back, ' + TEP.Auth.getUsername());
+    showMenu();
+  } else {
+    document.getElementById('auth-err').textContent = res.msg;
   }
+}
 
   async function handleRegister(e) {
     e.preventDefault();
