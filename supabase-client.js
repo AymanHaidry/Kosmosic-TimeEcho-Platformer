@@ -53,20 +53,39 @@ TEP.DB = (() => {
   }
 
   return {
-    setToken(tok) { accessToken = tok || SUPABASE_ANON; },
+  setToken(tok) { accessToken = tok || SUPABASE_ANON; },
 
-    // Auth
-    async signUp(email, password)  { return authFetch('signup', { email, password }); },
-    async signIn(email, password)  { return authFetch('token?grant_type=password', { email, password }); },
-    async signOut(token) {
-      try {
-        await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
-          method: 'POST',
-          headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${token}` },
-        });
-      } catch(e) {}
-    },
+  // Auth
+  async getUserByUsername(username) {
+  const rows = await this.select(
+    'profiles',
+    `select=email&username=eq.${encodeURIComponent(username)}`
+  );
 
+  console.log("Lookup:", username, rows);
+
+  return rows?.[0] || null;
+},
+
+  async signUp(email, password)  { 
+    return authFetch('signup', { email, password }); 
+  },
+
+  async signIn(email, password)  { 
+    return authFetch('token?grant_type=password', { email, password }); 
+  },
+
+  async signOut(token) {
+    try {
+      await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
+        method: 'POST',
+        headers: { 
+          'apikey': SUPABASE_ANON, 
+          'Authorization': `Bearer ${token}` 
+        },
+      });
+    } catch(e) {}
+  },
     // REST helpers
     async select(table, query = '') {
       return restFetch(`${table}${query ? '?' + query : ''}`);
