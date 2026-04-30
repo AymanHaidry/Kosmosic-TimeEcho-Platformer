@@ -37,10 +37,11 @@ TEP.Auth = (() => {
     return null;
   }
 
-  async function createProfile(userId, username) {
+  async function createProfile(userId, username, email) {
     const row = {
       id: userId,
       username,
+      email,
       coins: 0,
       level_progress: 1,
       pet: null,
@@ -103,8 +104,7 @@ TEP.Auth = (() => {
       // store a minimal, consistent session object
       saveSession({ user: _user, access_token: _token });
 
-      await createProfile(_user.id, username);
-      return { ok: true };
+      await createProfile(_user.id, username, email);      return { ok: true };
     },
 
     async login(identifier, password) {
@@ -115,7 +115,7 @@ TEP.Auth = (() => {
     if (!identifier.includes('@')) {
       const { data: userRow, error } = await TEP.DB.getUserByUsername(identifier);
 
-      if (error || !userRow) {
+      if (!userRow || !userRow.email) {
         return { ok: false, msg: 'User not found' };
       }
 
