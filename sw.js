@@ -12,7 +12,7 @@ const PRECACHE = [
   '/launchpad',
   '/style.css',
   '/config.js',
-   '/time-capsule.mp3'
+   '/time-capsule.mp3',
   '/supabase-client.js',
   '/auth.js',
   '/entities.js',
