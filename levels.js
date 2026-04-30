@@ -48,7 +48,7 @@ TEP.LEVELS = [
 // ━━ LEVEL 1 — "The First Ripple" ━━ tutorial, no enemies, night cave
 {
   num:1, name:'The First Ripple',
-  theme:'cave', isNight:false,
+  theme:'cave', 
   worldW:2400, worldH:620,
   start:[60, 520], goalPos:[2320, 460],
   platforms:[
@@ -88,7 +88,7 @@ TEP.LEVELS = [
 // ━━ LEVEL 2 — "Sky Bridges" ━━ moving platforms, no enemies
 {
   num:2, name:'Sky Bridges',
-  theme:'sky_islands', isNight:false,
+  theme:'sky_islands', 
   worldW:2800, worldH:600,
   start:[60,500], goalPos:[2720,440],
   platforms:[
@@ -125,7 +125,7 @@ TEP.LEVELS = [
 // ━━ LEVEL 3 — "Wisp Woods" ━━ EchoWisps introduced, night
 {
   num:3, name:'Wisp Woods',
-  theme:'haunted_forest', isNight:false,
+  theme:'haunted_forest', 
   worldW:2800, worldH:600,
   start:[60,500], goalPos:[2720,440],
   platforms:[
@@ -170,7 +170,7 @@ TEP.LEVELS = [
 // ━━ LEVEL 4 — "Laser Labyrinth" ━━ lasers + wisps + slimes
 {
   num:4, name:'Laser Labyrinth',
-  theme:'crystal_sky', isNight:false,
+  theme:'crystal_sky', 
   worldW:3000, worldH:640,
   start:[60,560], goalPos:[2920,500],
   platforms:[
@@ -219,7 +219,7 @@ TEP.LEVELS = [
 // ━━ LEVEL 5 — "Sentinel Station" ━━ Chrono Sentinels
 {
   num:5, name:'Sentinel Station',
-  theme:'neon_city', isNight:false,
+  theme:'neon_city', 
   worldW:3200, worldH:600,
   start:[60,500], goalPos:[3120,420],
   platforms:[
@@ -262,7 +262,7 @@ TEP.LEVELS = [
 // ━━ LEVEL 6 — "The Frozen Gauntlet" ━━ icy platforms, wisps
 {
   num:6, name:'The Frozen Gauntlet',
-  theme:'frozen_peaks', isNight:false,
+  theme:'frozen_peaks', 
   worldW:3000, worldH:600,
   start:[60,500], goalPos:[2920,420],
   platforms:[
@@ -313,7 +313,7 @@ TEP.LEVELS = [
 // ━━ LEVEL 7 — "Lava Core" ━━ lava everywhere, slimes+sentinels
 {
   num:7, name:'Lava Core',
-  theme:'lava_core', isNight:false,
+  theme:'lava_core', 
   worldW:3200, worldH:620,
   start:[60,530], goalPos:[3120,450],
   platforms:[
@@ -356,7 +356,7 @@ TEP.LEVELS = [
 // ━━ LEVEL 8 — "The Pressure Chamber" ━━ pressure plates, multi-echo
 {
   num:8, name:'The Pressure Chamber',
-  theme:'temple_gold', isNight:false,
+  theme:'temple_gold', 
   worldW:3200, worldH:600,
   start:[60,500], goalPos:[3120,420],
   platforms:[
@@ -406,7 +406,7 @@ TEP.LEVELS = [
 // ━━ LEVEL 9 — "Void Stalker" ━━ VoidShades introduced, night
 {
   num:9, name:'Void Stalker',
-  theme:'paradox_void', isNight:false,
+  theme:'paradox_void', 
   worldW:3400, worldH:620,
   start:[60,540], goalPos:[3320,460],
   platforms:[
@@ -452,7 +452,7 @@ TEP.LEVELS = [
 // ━━ LEVEL 10 — "Paradox Nexus" ━━ all enemy types, night
 {
   num:10, name:'Paradox Nexus',
-  theme:'paradox_void', isNight:false,
+  theme:'paradox_void', 
   worldW:4000, worldH:640,
   start:[60,560], goalPos:[3920,460],
   platforms:[
@@ -656,7 +656,7 @@ TEP.generateLevel = function(levelNum, seed, overrides = {}) {
     num: levelNum,
     name: overrides.name || `Sector ${levelNum}`,
     theme,
-    isNight: themeDef?.isNight || false,
+    isNight:false,
     worldW, worldH,
     start: [60, groundY - 50],
     goalPos: [goalX, goalY],
