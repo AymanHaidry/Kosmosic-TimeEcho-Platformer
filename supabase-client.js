@@ -57,11 +57,15 @@ TEP.DB = (() => {
 
   // Auth
   async getUserByUsername(username) {
-    return await this.select(
-      'profiles',
-      `username=ilike.${encodeURIComponent(username)}&select=email`
-    ).then(rows => rows?.[0] || null);
-  }, // ✅ COMMA HERE
+  const rows = await this.select(
+    'profiles',
+    `select=email&username=eq.${encodeURIComponent(username)}`
+  );
+
+  console.log("Lookup:", username, rows);
+
+  return rows?.[0] || null;
+},
 
   async signUp(email, password)  { 
     return authFetch('signup', { email, password }); 
