@@ -61,6 +61,8 @@ TEP.DB = (() => {
     'profiles',
     `select=email&username=eq.${encodeURIComponent(username)}`
   );
+  return rows?.[0] || null;
+};
 
   console.log("Lookup:", username, rows);
 
