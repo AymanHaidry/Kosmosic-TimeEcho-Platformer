@@ -51,7 +51,8 @@ TEP.Renderer = (() => {
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
 
-    if (theme.isNight || theme.skyTop < '#555') drawStars(camX);
+   // no stars
+// drawStars(camX);
 
     drawHillLayer(theme.far  || theme.layers?.[0] || '#111', camX, 0.04, H * 0.55, H * 0.12, 0.003);
     drawHillLayer(theme.mid  || theme.layers?.[1] || '#181818', camX, 0.12, H * 0.65, H * 0.10, 0.005);
