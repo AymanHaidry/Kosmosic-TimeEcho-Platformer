@@ -1,13 +1,10 @@
 /* =====================================================
    TIME ECHO PLATFORMER — supabase-client.js
    Thin REST wrapper around Supabase.
-   Replace SUPABASE_URL and SUPABASE_KEY with your
-   project credentials from supabase.com
    ===================================================== */
 window.TEP = window.TEP || {};
-
-const SUPABASE_URL = 'https://bjxexkbfzvqjdizxchhk.supabase.co'; // ← replace
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqeGV4a2JmenZxamRpenhjaGhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwMTQ4MjQsImV4cCI6MjA5MjU5MDgyNH0.CdCcu7e14CHMtG4bOzql8XCwuGDcQtTiSQE0IDBd5UU';                   // ← replace
+const SUPABASE_URL = 'https://bjxexkbfzvqjdizxchhk.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqeGV4a2JmenZxamRpenhjaGhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwMTQ4MjQsImV4cCI6MjA5MjU5MDgyNH0.CdCcu7e14CHMtG4bOzql8XCwuGDcQtTiSQE0IDBd5UU';
 
 TEP.DB = (() => {
   let accessToken = SUPABASE_ANON;
@@ -24,7 +21,11 @@ TEP.DB = (() => {
   async function restFetch(path, opts = {}) {
     try {
       const url = `${SUPABASE_URL}/rest/v1/${path}`;
-      const res = await fetch(url, { headers: headers(), ...opts });
+      const mergedOpts = {
+        ...opts,
+        headers: { ...headers(), ...(opts.headers || {}) },
+      };
+      const res = await fetch(url, mergedOpts);
       if (!res.ok) {
         const errText = await res.text();
         console.warn('[DB]', res.status, errText);
@@ -42,10 +43,17 @@ TEP.DB = (() => {
     try {
       const res = await fetch(`${SUPABASE_URL}/auth/v1/${endpoint}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON,
+        },
         body: JSON.stringify(body),
       });
-      return await res.json();
+      const data = await res.json();
+      if (!res.ok) {
+        return { error: data.error || 'Auth failed', msg: data.error_description || data.msg || '' };
+      }
+      return data;
     } catch (e) {
       console.warn('[Auth] error:', e);
       return { error: e.message };
@@ -53,64 +61,70 @@ TEP.DB = (() => {
   }
 
   return {
-  setToken(tok) { accessToken = tok || SUPABASE_ANON; },
+    setToken(tok) {
+      accessToken = tok || SUPABASE_ANON;
+    },
 
-  // Auth
-  async getUserByUsername(username) {
-  const rows = await this.select(
-    'profiles',
-    `select=email&username=eq.${encodeURIComponent(username)}`
-  );
+    // ── Auth ────────────────────────────────────────────
+    async signUp(email, password) {
+      return authFetch('signup', { email, password });
+    },
 
-  console.log("Lookup:", username, rows);
+    async signIn(email, password) {
+      return authFetch('token?grant_type=password', { email, password });
+    },
 
-  return rows?.[0] || null;
-},
+    async signOut(token) {
+      try {
+        await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON,
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+      } catch (e) {}
+    },
 
-  async signUp(email, password)  { 
-    return authFetch('signup', { email, password }); 
-  },
+    // ── Username lookup ─────────────────────────────────
+    async getUserByUsername(username) {
+      const rows = await this.select(
+        'profiles',
+        `select=email&username=eq.${encodeURIComponent(username)}`
+      );
+      console.log('[DB] getUserByUsername lookup:', username, rows);
+      return rows?.[0] || null;
+    },
 
-  async signIn(email, password)  { 
-    return authFetch('token?grant_type=password', { email, password }); 
-  },
-
-  async signOut(token) {
-    try {
-      await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
-        method: 'POST',
-        headers: { 
-          'apikey': SUPABASE_ANON, 
-          'Authorization': `Bearer ${token}` 
-        },
-      });
-    } catch(e) {}
-  },
-    // REST helpers
+    // ── REST helpers ────────────────────────────────────
     async select(table, query = '') {
       return restFetch(`${table}${query ? '?' + query : ''}`);
     },
+
     async insert(table, row) {
       return restFetch(table, {
         method: 'POST',
-        headers: headers({ 'Prefer': 'return=representation' }),
+        headers: { 'Prefer': 'return=representation' },
         body: JSON.stringify(row),
       });
     },
+
     async update(table, query, patch) {
       return restFetch(`${table}?${query}`, {
         method: 'PATCH',
-        headers: headers({ 'Prefer': 'return=minimal' }),
+        headers: { 'Prefer': 'return=minimal' },
         body: JSON.stringify(patch),
       });
     },
+
     async upsert(table, row) {
       return restFetch(table, {
         method: 'POST',
-        headers: headers({ 'Prefer': 'return=representation,resolution=merge-duplicates' }),
+        headers: { 'Prefer': 'return=representation,resolution=merge-duplicates' },
         body: JSON.stringify(row),
       });
     },
+
     async rpc(fn, params = {}) {
       return restFetch(`rpc/${fn}`, {
         method: 'POST',
