@@ -148,7 +148,7 @@ TEP.Renderer = (() => {
     const sx = px(actor.x - camX);
     const sy = py(actor.y - camY);
 
-    glow(sx, sy, actor.w, actor.h, actor.color || '#00d4ff', 0.18);
+    glow(sx, sy, actor.w, actor.h, actor.color || '#00d4ff', 0.05);
 
     ctx.fillStyle = actor.color || '#00d4ff';
     ctx.fillRect(sx, sy, actor.w, actor.h);
