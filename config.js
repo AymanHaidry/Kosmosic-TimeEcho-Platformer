@@ -77,7 +77,7 @@ TEP.CONFIG = {
   // ── Biome themes (15 total) ────────────────────────
   THEMES: {
     cave: {
-      name: 'Crystal Cave', isNight: true,
+      name: 'Crystal Cave', isNight: false,
       skyTop:'#060212', skyBot:'#1a0a2e',
       far:'#0d0520', mid:'#1a0a38', near:'#2d1155',
       ground:'#3d2b0a', platformTop:'#7a5a10', platformSide:'#4a3508', platformLight:'#c49a20',
@@ -85,7 +85,7 @@ TEP.CONFIG = {
       ambience:'rgba(60,10,120,0.05)',
     },
     neon_city: {
-      name: 'Neon City', isNight: true,
+      name: 'Neon City', isNight: false,
       skyTop:'#000510', skyBot:'#060d22',
       far:'#050510', mid:'#080820', near:'#0d0d2e',
       ground:'#0a0a20', platformTop:'#1a0a5a', platformSide:'#0d0540', platformLight:'#6030ff',
@@ -101,7 +101,7 @@ TEP.CONFIG = {
       ambience:'rgba(255,80,20,0.04)',
     },
     crystal_sky: {
-      name: 'Crystal Sky', isNight: true,
+      name: 'Crystal Sky', isNight: false,
       skyTop:'#030c1a', skyBot:'#0a2555',
       far:'#0a1a3a', mid:'#0d2855', near:'#0f3070',
       ground:'#0a3355', platformTop:'#1a7aaa', platformSide:'#0f4a70', platformLight:'#55d4ff',
@@ -109,7 +109,7 @@ TEP.CONFIG = {
       ambience:'rgba(10,100,200,0.06)',
     },
     haunted_forest: {
-      name: 'Haunted Forest', isNight: true,
+      name: 'Haunted Forest', isNight: false,
       skyTop:'#050d05', skyBot:'#0d1f0d',
       far:'#0a150a', mid:'#0f2010', near:'#142814',
       ground:'#1a3d0a', platformTop:'#2a6014', platformSide:'#1a3d0a', platformLight:'#44cc22',
@@ -141,7 +141,7 @@ TEP.CONFIG = {
       ambience:'rgba(200,150,20,0.04)',
     },
     paradox_void: {
-      name: 'Paradox Void', isNight: true,
+      name: 'Paradox Void', isNight: false,
       skyTop:'#050010', skyBot:'#100520',
       far:'#0a052a', mid:'#150a40', near:'#200f55',
       ground:'#1a0a40', platformTop:'#6a00cc', platformSide:'#400080', platformLight:'#aa44ff',
@@ -157,7 +157,7 @@ TEP.CONFIG = {
       ambience:null,
     },
     deep_ocean: {
-      name: 'Deep Ocean', isNight: true,
+      name: 'Deep Ocean', isNight: false,
       skyTop:'#000814', skyBot:'#001a30',
       far:'#001028', mid:'#001838', near:'#002045',
       ground:'#003060', platformTop:'#004080', platformSide:'#002855', platformLight:'#0099cc',
@@ -165,7 +165,7 @@ TEP.CONFIG = {
       ambience:'rgba(0,80,150,0.08)',
     },
     desert_night: {
-      name: 'Desert Night', isNight: true,
+      name: 'Desert Night', isNight: false,
       skyTop:'#05030a', skyBot:'#0d0820',
       far:'#0a0618', mid:'#120c25', near:'#1a1235',
       ground:'#8a6a20', platformTop:'#aa8828', platformSide:'#7a5818', platformLight:'#ddaa44',
@@ -173,7 +173,7 @@ TEP.CONFIG = {
       ambience:'rgba(150,100,20,0.04)',
     },
     blood_moon: {
-      name: 'Blood Moon', isNight: true,
+      name: 'Blood Moon', isNight: false,
       skyTop:'#0a0005', skyBot:'#300010',
       far:'#1a0010', mid:'#280018', near:'#380020',
       ground:'#2a0010', platformTop:'#550020', platformSide:'#3a0018', platformLight:'#cc0040',
@@ -181,7 +181,7 @@ TEP.CONFIG = {
       ambience:'rgba(180,0,40,0.08)',
     },
     time_rift: {
-      name: 'Time Rift', isNight: true,
+      name: 'Time Rift', isNight: false,
       skyTop:'#000a0a', skyBot:'#001a20',
       far:'#001520', mid:'#002030', near:'#002840',
       ground:'#003344', platformTop:'#005566', platformSide:'#003344', platformLight:'#00eecc',
