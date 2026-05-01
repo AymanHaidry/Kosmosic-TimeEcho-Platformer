@@ -442,17 +442,19 @@ TEP.Renderer = (() => {
     const sy = py(actor.y - camY);
     if (sx + actor.w < -10 || sx > W + 10) return;
 
-    // Subtle glow — no CSS filter (too slow/blurry)
-    // Subtle glow (outer + inner layered aura)
-ctx.globalAlpha = 0.06;
+    // BIG glow layers
+ctx.globalAlpha = 0.10;
 ctx.fillStyle = echo.color;
-ctx.fillRect(sx - 360, sy - 360, actor.w + 18, actor.h + 18);
+ctx.fillRect(sx - 40, sy - 40, actor.w + 80, actor.h + 80);
 
-ctx.globalAlpha = 0.08;
-ctx.fillStyle = echo.color;
-ctx.fillRect(sx - 600, sy - 600, actor.w + 30, actor.h + 30);
+ctx.globalAlpha = 0.07;
+ctx.fillRect(sx - 70, sy - 70, actor.w + 140, actor.h + 140);
+
+ctx.globalAlpha = 0.04;
+ctx.fillRect(sx - 110, sy - 110, actor.w + 220, actor.h + 220);
 
 ctx.globalAlpha = 1;
+     
 
     drawActorTrail(actor, camX, camY, echo.color);
     // Draw echo at 80% alpha
