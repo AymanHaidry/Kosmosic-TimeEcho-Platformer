@@ -954,7 +954,7 @@ ctx.globalAlpha = 1;
   // ── Main draw ─────────────────────────────────────
   function drawWorld(state, camX, camY, theme) {
     const { level, player, echoes } = state;
-    ctx.fillStyle = '#080810';
+    ctx.fillStyle = '#87CEEB';
     ctx.fillRect(0,0,W,H);
     drawBackground(camX, theme);
 
