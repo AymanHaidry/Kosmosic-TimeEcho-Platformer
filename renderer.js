@@ -443,10 +443,16 @@ TEP.Renderer = (() => {
     if (sx + actor.w < -10 || sx > W + 10) return;
 
     // Subtle glow — no CSS filter (too slow/blurry)
-    ctx.globalAlpha = 0.18;
-    ctx.fillStyle = echo.color;
-    ctx.fillRect(sx - 3, sy - 3, actor.w + 6, actor.h + 6);
-    ctx.globalAlpha = 1;
+    // Subtle glow (outer + inner layered aura)
+ctx.globalAlpha = 0.18;
+ctx.fillStyle = echo.color;
+ctx.fillRect(sx - 9, sy - 9, actor.w + 18, actor.h + 18);
+
+ctx.globalAlpha = 0.10;
+ctx.fillStyle = echo.color;
+ctx.fillRect(sx - 15, sy - 15, actor.w + 30, actor.h + 30);
+
+ctx.globalAlpha = 1;
 
     drawActorTrail(actor, camX, camY, echo.color);
     // Draw echo at 80% alpha
