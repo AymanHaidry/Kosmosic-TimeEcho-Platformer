@@ -12,203 +12,547 @@
 
   <title>Time Echo Platformer</title>
   <meta name="description" content="Beat puzzles with your past self. A pixel-art time-echo platformer where you record echoes of yourself to solve puzzles."/>
-  <meta name="keywords" content="platformer, puzzle, game, pixel-art, time-travel, echo"/>
 
   <link rel="manifest" href="/manifest.json"/>
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%2308080f'/%3E%3Crect x='48' y='18' width='96' height='72' fill='%23005577'/%3E%3Crect x='54' y='12' width='84' height='30' fill='%23006699'/%3E%3Crect x='54' y='36' width='84' height='36' fill='%23001122'/%3E%3Crect x='60' y='42' width='72' height='24' fill='%2300d4ff' opacity='.8'/%3E%3C/svg%3E"/>
-
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2308080f'/%3E%3C!-- helmet --%3E%3Crect x='8' y='3' width='16' height='12' fill='%23005577'/%3E%3Crect x='9' y='2' width='14' height='5' fill='%23006699'/%3E%3C!-- visor --%3E%3Crect x='9' y='6' width='14' height='6' fill='%23001122'/%3E%3Crect x='10' y='7' width='12' height='4' fill='%2300d4ff' opacity='.8'/%3E%3Crect x='18' y='8' width='3' height='2' fill='%23fff'/%3E%3C!-- body --%3E%3Crect x='9' y='14' width='14' height='12' fill='%23004466'/%3E%3Crect x='12' y='15' width='8' height='8' fill='%2300d4ff'/%3E%3Crect x='14' y='17' width='4' height='4' fill='%23fff'/%3E%3Crect x='15' y='18' width='2' height='2' fill='%2300d4ff'/%3E%3C!-- legs --%3E%3Crect x='9' y='25' width='6' height='6' fill='%23004466'/%3E%3Crect x='17' y='25' width='6' height='6' fill='%23004466'/%3E%3C!-- arms --%3E%3Crect x='4' y='15' width='5' height='9' fill='%23003355'/%3E%3Crect x='23' y='15' width='5' height='9' fill='%23003355'/%3E%3C/svg%3E"/>
   <link rel="stylesheet" href="/style.css"/>
-
-  <!-- Pixel font -->
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" as="style"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"/>
+
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
-  <script>
-document.addEventListener('click', () => {
-  if (!window.__bgmStarted) {
-    window.__bgmStarted = true;
-
-    const audio = new Audio('time-capsule.mp3');
-    audio.loop = true;
-    audio.volume = 0.5;
-
-    audio.play().then(() => {
-      console.log("✅ BGM started");
-    }).catch(err => {
-      console.log("❌ BGM blocked:", err);
-    });
-
-    // optional: store globally so you can control later
-    window.__bgm = audio;
-  }
-}, { once: true });
-</script>
 
   <style>
-    /* ── Touch controls: auto-show on touch devices, hide on PC ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --px: 'Press Start 2P', monospace;
+      --dirt-dark:  #3d2b1a;
+      --dirt-mid:   #5a3d22;
+      --dirt-light: #7a5530;
+      --stone-dark: #2a2a2a;
+      --stone-mid:  #3c3c3c;
+      --stone-light:#4e4e4e;
+      --cyan:       #00d4ff;
+      --cyan-glow:  rgba(0,212,255,0.35);
+      --gold:       #ffd700;
+      --red:        #ff4455;
+      --green:      #44cc22;
+      --ui-bg:      rgba(8,8,15,0.88);
+      --border:     #00d4ff44;
+    }
+
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      background: #000;
+      font-family: var(--px);
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='8' height='8' fill='%2300d4ff'/%3E%3Crect x='8' y='8' width='8' height='8' fill='%2300d4ff'/%3E%3C/svg%3E") 0 0, crosshair;
+    }
+
+    /* ── PANORAMA BACKGROUND ─────────────────────────── */
+    #panorama-canvas {
+      position: fixed; inset: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+    }
+
+    /* ── DIRT TEXTURE OVERLAY (tiled pixel pattern) ──── */
+    #dirt-overlay {
+      position: fixed; inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background-image:
+        /* Repeating pixel dirt pattern */
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 2px, transparent 2px, transparent 8px),
+        repeating-linear-gradient(90deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 8px);
+      background-size: 8px 8px;
+    }
+
+    /* ── VIGNETTE ────────────────────────────────────── */
+    #vignette {
+      position: fixed; inset: 0; z-index: 2; pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.75) 100%);
+    }
+
+    /* ── MAIN LAYOUT ────────────────────────────────── */
+    #app {
+      position: relative; z-index: 10;
+      width: 100%; height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 0;
+    }
+
+    /* ── TITLE BLOCK ─────────────────────────────────── */
+    #title-block {
+      text-align: center;
+      margin-bottom: 28px;
+      animation: titleDrop 0.6s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes titleDrop {
+      from { opacity:0; transform:translateY(-40px) scale(0.9); }
+      to   { opacity:1; transform:translateY(0) scale(1); }
+    }
+
+    #game-title {
+      font-family: var(--px);
+      font-size: clamp(22px, 4vw, 42px);
+      letter-spacing: 4px;
+      line-height: 1.2;
+      /* Minecraft-style layered text shadow */
+      color: #ffffff;
+      text-shadow:
+        3px 3px 0 #3a3a00,
+        -1px -1px 0 #555500,
+        0 0 30px rgba(255,220,0,0.4),
+        0 0 60px rgba(255,220,0,0.15);
+      image-rendering: pixelated;
+      user-select: none;
+    }
+    #game-title span {
+      color: #00d4ff;
+      text-shadow:
+        3px 3px 0 #003355,
+        0 0 30px rgba(0,212,255,0.6),
+        0 0 70px rgba(0,212,255,0.2);
+    }
+
+    #game-subtitle {
+      font-family: var(--px);
+      font-size: clamp(6px, 1.1vw, 10px);
+      color: #aaa;
+      margin-top: 10px;
+      letter-spacing: 2px;
+      text-shadow: 1px 1px 0 #000;
+      animation: pulse 3s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 0.6; } 50% { opacity: 1; }
+    }
+
+    /* ── MENU CONTAINER ─────────────────────────────── */
+    #menu-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      animation: menuRise 0.7s 0.15s cubic-bezier(.22,1,.36,1) both;
+      width: min(380px, 90vw);
+    }
+    @keyframes menuRise {
+      from { opacity:0; transform:translateY(30px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ── MINECRAFT-STYLE BUTTON ──────────────────────── */
+    .mc-btn {
+      width: 100%;
+      padding: 11px 20px;
+      font-family: var(--px);
+      font-size: clamp(7px, 1.3vw, 11px);
+      letter-spacing: 1px;
+      text-align: center;
+      color: #fff;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      position: relative;
+      user-select: none;
+      transition: filter 0.05s, transform 0.05s;
+
+      /* Stone button: layered box-shadows for 3D pixel look */
+      background: linear-gradient(180deg, #5a5a5a 0%, #3c3c3c 45%, #2e2e2e 46%, #3a3a3a 100%);
+      border-top:    3px solid #8a8a8a;
+      border-left:   3px solid #7a7a7a;
+      border-right:  3px solid #1a1a1a;
+      border-bottom: 3px solid #111;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 4px 0 #111,
+        0 5px 8px rgba(0,0,0,0.5);
+      text-shadow: 2px 2px 0 #000, 0 0 8px rgba(0,212,255,0.3);
+      image-rendering: pixelated;
+    }
+
+    .mc-btn:hover {
+      background: linear-gradient(180deg, #7a9aff 0%, #4a6aee 45%, #3a5add 46%, #4a6aff 100%);
+      border-top-color:    #aabbff;
+      border-left-color:   #99aaff;
+      border-right-color:  #1a2280;
+      border-bottom-color: #111833;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.15),
+        0 4px 0 #111,
+        0 5px 16px rgba(80,120,255,0.4),
+        0 0 30px rgba(0,212,255,0.15);
+      text-shadow: 2px 2px 0 #000, 0 0 12px rgba(0,212,255,0.8);
+      filter: brightness(1.08);
+    }
+
+    .mc-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #111, 0 2px 4px rgba(0,0,0,0.5);
+      border-top-color:    #5a5a5a;
+      border-bottom-color: #3a3aaa;
+    }
+
+    /* Primary button — glowing cyan */
+    .mc-btn.primary {
+      background: linear-gradient(180deg, #006688 0%, #004466 45%, #003355 46%, #004060 100%);
+      border-top-color:    #00aadd;
+      border-left-color:   #0088bb;
+      border-right-color:  #001a33;
+      border-bottom-color: #001122;
+      box-shadow:
+        inset 0 1px 0 rgba(0,212,255,0.15),
+        0 4px 0 #001122,
+        0 5px 20px rgba(0,212,255,0.25),
+        0 0 40px rgba(0,212,255,0.08);
+      color: #00d4ff;
+      text-shadow: 2px 2px 0 #000, 0 0 12px rgba(0,212,255,0.6);
+    }
+    .mc-btn.primary:hover {
+      background: linear-gradient(180deg, #0099cc 0%, #007799 45%, #006688 46%, #0088aa 100%);
+      border-top-color: #55eeff;
+      border-left-color: #33ccee;
+      box-shadow:
+        inset 0 1px 0 rgba(0,255,255,0.2),
+        0 4px 0 #001122,
+        0 5px 28px rgba(0,212,255,0.55),
+        0 0 60px rgba(0,212,255,0.2);
+      color: #fff;
+    }
+
+    /* Danger button */
+    .mc-btn.danger {
+      background: linear-gradient(180deg, #661122 0%, #440d1a 45%, #330c14 46%, #3d0f18 100%);
+      border-top-color:    #cc2244;
+      border-left-color:   #aa1a33;
+      border-right-color:  #220611;
+      border-bottom-color: #110309;
+      color: #ff7799;
+      text-shadow: 2px 2px 0 #000, 0 0 8px rgba(255,40,80,0.4);
+    }
+
+    /* Small dual-column row */
+    .mc-btn-row {
+      display: flex; gap: 6px; width: 100%;
+    }
+    .mc-btn-row .mc-btn { flex: 1; font-size: clamp(6px, 1vw, 9px); }
+
+    /* ── DIVIDER ────────────────────────────────────── */
+    .mc-divider {
+      width: 100%; height: 3px; margin: 6px 0;
+      background: linear-gradient(90deg, transparent, #444, #666, #444, transparent);
+      position: relative;
+    }
+    .mc-divider::after {
+      content: '';
+      position: absolute; inset: 1px;
+      background: linear-gradient(90deg, transparent, #222, #333, #222, transparent);
+    }
+
+    /* ── VERSION TAG ────────────────────────────────── */
+    #version-tag {
+      position: fixed; bottom: 10px; left: 12px;
+      font-family: var(--px); font-size: 7px;
+      color: #555; text-shadow: 1px 1px 0 #000;
+      z-index: 20;
+      pointer-events: none;
+    }
+    #copyright-tag {
+      position: fixed; bottom: 10px; right: 12px;
+      font-family: var(--px); font-size: 7px;
+      color: #444; text-shadow: 1px 1px 0 #000;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    /* ── PIXEL PARTICLES ────────────────────────────── */
+    #particles { position:fixed; inset:0; z-index:3; pointer-events:none; }
+
+    /* ── SPLASH TEXT ────────────────────────────────── */
+    #splash {
+      position: fixed; top: 22%; left: 50%;
+      transform: translateX(-40%) rotate(-15deg);
+      font-family: var(--px);
+      font-size: clamp(7px, 1.3vw, 11px);
+      color: #ffd700;
+      text-shadow: 2px 2px 0 #664400, 0 0 20px rgba(255,200,0,0.6);
+      animation: splashPop 0.8s ease-out both, splashBob 2s 0.8s ease-in-out infinite;
+      z-index: 15;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    @keyframes splashPop {
+      from { transform: translateX(-40%) rotate(-15deg) scale(0); opacity:0; }
+      60%  { transform: translateX(-40%) rotate(-15deg) scale(1.2); }
+      to   { transform: translateX(-40%) rotate(-15deg) scale(1); opacity:1; }
+    }
+    @keyframes splashBob {
+      0%,100% { transform: translateX(-40%) rotate(-15deg) scale(1); }
+      50%     { transform: translateX(-40%) rotate(-15deg) scale(1.06); }
+    }
+
+    /* ── STATS BAR ──────────────────────────────────── */
+    #stats-bar {
+      margin-top: 14px;
+      display: flex; gap: 18px;
+      font-family: var(--px); font-size: 7px;
+      color: #666;
+      animation: menuRise 0.8s 0.3s both;
+    }
+    #stats-bar span { text-shadow: 1px 1px 0 #000; }
+
+    /* ── NAV (top bar) ──────────────────────────────── */
+    #top-bar {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 20;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 16px;
+      background: rgba(0,0,0,0.55);
+      border-bottom: 2px solid rgba(0,212,255,0.12);
+      backdrop-filter: blur(4px);
+    }
+    #top-bar .logo {
+      font-family: var(--px); font-size: 9px;
+      color: #00d4ff; text-shadow: 1px 1px 0 #003344, 0 0 10px rgba(0,212,255,0.5);
+      cursor: pointer;
+    }
+    #top-bar-right {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .top-btn {
+      font-family: var(--px); font-size: 7px;
+      color: #aaa; background: transparent; border: none;
+      cursor: pointer; padding: 4px 8px;
+      transition: color 0.1s;
+    }
+    .top-btn:hover { color: #00d4ff; }
+
+    /* ── PWA BANNER ─────────────────────────────────── */
+    #pwa-banner {
+      display: none;
+      position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
+      background: rgba(8,8,15,0.96);
+      border: 3px solid #00d4ff44;
+      border-top-color: #00d4ff88;
+      border-left-color: #00d4ff66;
+      color: #cfe8ff;
+      font-family: var(--px); font-size: 7px;
+      padding: 14px 20px; gap: 10px;
+      align-items: center; z-index: 9001;
+      box-shadow: 0 0 40px rgba(0,212,255,0.15);
+      max-width: 340px; text-align: center;
+    }
+    #pwa-banner.show { display: flex; flex-direction: column; }
+    #pwa-banner-btns { display: flex; gap: 10px; margin-top: 10px; }
+
+    /* ── TOAST ──────────────────────────────────────── */
+    #toast {
+      position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-20px);
+      font-family: var(--px); font-size: 8px;
+      padding: 10px 18px;
+      border: 2px solid rgba(0,0,0,0.4);
+      border-top-color: rgba(255,255,255,0.3);
+      border-left-color: rgba(255,255,255,0.2);
+      box-shadow: 0 4px 0 rgba(0,0,0,0.5), 0 8px 20px rgba(0,0,0,0.4);
+      opacity: 0; z-index: 9999;
+      transition: opacity 0.25s, transform 0.25s;
+      pointer-events: none;
+      white-space: nowrap;
+      image-rendering: pixelated;
+    }
+
+    /* ── TOUCH ──────────────────────────────────────── */
     @media (hover: none) and (pointer: coarse) {
       #touch-controls { display: flex !important; }
     }
-    /* ── PWA install banner ── */
-    #pwa-banner {
-      display: none;
-      position: fixed;
-      bottom: 60px; left: 50%; transform: translateX(-50%);
-      background: rgba(8,8,15,0.95);
-      border: 2px solid #00d4ff;
-      color: #cfe8ff;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      padding: 12px 18px;
-      gap: 12px;
-      align-items: center;
-      z-index: 9001;
-      box-shadow: 0 0 30px rgba(0,212,255,0.2);
-      max-width: 320px;
-      text-align: center;
+    #touch-controls { display: none; }
+
+    /* ── PANELS (same as before, just ensuring hidden works) ── */
+    .tep-panel { display: block; }
+    .tep-panel.hidden { display: none !important; }
+
+    /* ── SCANLINES ──────────────────────────────────── */
+    #scanlines {
+      position: fixed; inset: 0; z-index: 4; pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0,0,0,0) 0px, rgba(0,0,0,0) 3px,
+        rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px
+      );
     }
-    #pwa-banner.show { display: flex; flex-direction: column; }
-    #pwa-banner-btns { display: flex; gap: 10px; margin-top: 8px; }
-    #pwa-install-btn {
-      background: rgba(0,212,255,0.15);
-      border: 1px solid #00d4ff;
-      color: #00d4ff;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 6px;
-      padding: 7px 14px;
-      cursor: pointer;
-      transition: all .15s;
+
+    /* ── BLOCK COUNTER ANIMATION ────────────────────── */
+    @keyframes blockFloat {
+      0%   { transform: translateY(0)   rotate(0deg);   opacity:0.7; }
+      50%  { transform: translateY(-60px) rotate(180deg); opacity:0.4; }
+      100% { transform: translateY(-120px) rotate(360deg); opacity:0; }
     }
-    #pwa-install-btn:hover { background: rgba(0,212,255,0.3); }
-    #pwa-dismiss-btn {
-      background: transparent;
-      border: 1px solid #2a2a5a;
-      color: #5a7090;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 6px;
-      padding: 7px 14px;
-      cursor: pointer;
+
+    /* ── RESPONSIVE ─────────────────────────────────── */
+    @media (max-width: 500px) {
+      #splash { display: none; }
+      #game-title { font-size: 18px; }
+      #menu-container { width: 94vw; }
     }
   </style>
 </head>
 <body>
-<div id="app-container">
-  <!-- ══ NAV ═══════════════════════════════════════════ -->
-  <nav id="nav" role="navigation">
-    <div class="logo" onclick="TEP.UI.showMenu()" role="button" tabindex="0" title="Go to main menu">
-      TIME<span>ECHO</span>
+
+<!-- Panorama canvas -->
+<canvas id="panorama-canvas"></canvas>
+
+<!-- Overlays -->
+<div id="dirt-overlay"></div>
+<div id="scanlines"></div>
+<div id="vignette"></div>
+<canvas id="particles"></canvas>
+
+<!-- Splash text -->
+<div id="splash">Now with Echoes!</div>
+
+<!-- Top bar -->
+<div id="top-bar">
+  <div class="logo">TIME<span style="color:#fff;opacity:0.6">·</span>ECHO</div>
+  <div id="top-bar-right">
+    <div id="nav-guest" style="display:flex;gap:6px;">
+      <button class="top-btn" onclick="TEP.UI.showAuth('login')">LOGIN</button>
+      <button class="top-btn" onclick="TEP.UI.showAuth('register')">REGISTER</button>
     </div>
-    <div class="nav-links">
-      <button class="nav-btn" onclick="TEP.UI.showMenu()" type="button">PLAY</button>
-      <button class="nav-btn" onclick="TEP.UI.showShop()" type="button">SHOP</button>
-      <button class="nav-btn" onclick="TEP.UI.showLeaderboard()" type="button">SCORES</button>
-      <button class="nav-btn" onclick="TEP.UI.showAchievements()" type="button">TROPHIES</button>
-      <button class="nav-btn" onclick="TEP.UI.showHelp()" type="button">HOW TO PLAY</button>
-
-      <!-- Guest -->
-      <div id="nav-guest">
-        <button class="nav-btn accent" onclick="TEP.UI.showAuth('login')" type="button">LOGIN</button>
-        <button class="nav-btn" onclick="TEP.UI.showAuth('register')" type="button">REGISTER</button>
-      </div>
-
-      <!-- Logged in -->
-      <div id="nav-user" class="hidden" style="display:flex;align-items:center;gap:8px;">
-        <span id="nav-username"></span>
-        <span id="nav-coins"></span>
-        <button class="nav-btn danger" id="logout-btn" type="button">LOGOUT</button>
-      </div>
+    <div id="nav-user" class="hidden" style="display:flex;align-items:center;gap:10px;">
+      <span id="nav-username" style="font-family:var(--px);font-size:7px;color:#00d4ff;"></span>
+      <span id="nav-coins" style="font-family:var(--px);font-size:7px;color:#ffd700;"></span>
+      <button class="top-btn" id="logout-btn">LOGOUT</button>
     </div>
-  </nav>
+  </div>
+</div>
 
-  <!-- ══ GAME AREA ═════════════════════════════════════ -->
-  <main id="main-game">
-    <div id="canvas-wrap" role="img" aria-label="Game canvas">
-      <canvas id="game-canvas" width="900" height="500" title="Time Echo Game Canvas"></canvas>
+<!-- Main app -->
+<div id="app">
+
+  <!-- Title -->
+  <div id="title-block">
+    <div id="game-title">TIME <span>ECHO</span></div>
+    <div id="game-subtitle">Beat puzzles with your past self.</div>
+  </div>
+
+  <!-- Menu buttons -->
+  <div id="menu-container">
+    <button class="mc-btn primary" onclick="TEP.UI._scrollToLevels ? (TEP.UI.showMenu(), setTimeout(TEP.UI._scrollToLevels,100)) : TEP.UI.showMenu()">
+      ▶ &nbsp; SINGLEPLAYER
+    </button>
+
+    <div class="mc-btn-row">
+      <button class="mc-btn" onclick="TEP.Game.startEndless(); TEP.UI.hideAll()">
+        ♾ &nbsp; ENDLESS
+      </button>
+      <button class="mc-btn" onclick="TEP.Game.startEndless(TEP.getDailySeed()); TEP.UI.hideAll()">
+        📅 &nbsp; DAILY
+      </button>
     </div>
 
-    <!-- Mobile touch controls (auto-shown on touch devices via CSS media query) -->
-    <aside id="touch-controls" aria-label="Mobile game controls">
-      <div class="touch-dpad" title="Movement controls">
-        <button class="touch-btn" id="tc-left" type="button" aria-label="Move left">◀</button>
-        <button class="touch-btn" id="tc-right" type="button" aria-label="Move right">▶</button>
-      </div>
-      <div class="touch-actions" title="Action controls">
-        <button class="touch-btn rec-btn" id="tc-record" type="button" aria-label="Record echo">●REC</button>
-        <button class="touch-btn" id="tc-jump" type="button" aria-label="Jump">▲</button>
-      </div>
-    </aside>
-  </main>
+    <div class="mc-divider"></div>
 
-  <!-- ══ PANELS ═════════════════════════════════════════ -->
-  <div id="panels-container">
+    <div class="mc-btn-row">
+      <button class="mc-btn" onclick="TEP.UI.showShop()">🛍 &nbsp; SHOP</button>
+      <button class="mc-btn" onclick="TEP.UI.showLeaderboard()">🏆 &nbsp; SCORES</button>
+    </div>
 
-<!-- ── MAIN MENU ──────────────────────────────────── -->
-<div class="tep-panel" id="main-menu">
+    <div class="mc-btn-row">
+      <button class="mc-btn" onclick="TEP.UI.showAchievements()">🏅 &nbsp; TROPHIES</button>
+      <button class="mc-btn" onclick="TEP.UI.showHelp()">❓ &nbsp; HOW TO PLAY</button>
+    </div>
+
+    <div class="mc-divider"></div>
+
+    <button class="mc-btn danger" id="quit-btn" onclick="showToastLocal('You\'re already here. There\'s no escape.', '#ff4455')">
+      ✕ &nbsp; QUIT TO REALITY
+    </button>
+  </div>
+
+  <!-- Stats -->
+  <div id="stats-bar">
+    <span id="stat-level">LVL —</span>
+    <span id="stat-coins">🪙 —</span>
+    <span id="stat-theme">THEME —</span>
+  </div>
+
+</div><!-- end #app -->
+
+<!-- Version tags -->
+<div id="version-tag">Time Echo v3.0</div>
+<div id="copyright-tag">© 2025 TimeEcho</div>
+
+<!-- PWA install banner -->
+<div id="pwa-banner">
+  <div>📲 INSTALL TIME ECHO</div>
+  <div style="color:#556;font-size:6px;margin-top:4px">Play offline · Full screen · No browser UI</div>
+  <div id="pwa-banner-btns">
+    <button id="pwa-install-btn" class="mc-btn" style="font-size:7px;padding:6px 14px;width:auto;">INSTALL</button>
+    <button id="pwa-dismiss-btn" class="mc-btn" style="font-size:7px;padding:6px 14px;width:auto;color:#666;">LATER</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<!-- ══ GAME CANVAS (hidden until a level starts) ══════ -->
+<main id="main-game" style="display:none;position:fixed;inset:0;z-index:100;background:#000;">
+  <div id="canvas-wrap" role="img" aria-label="Game canvas">
+    <canvas id="game-canvas" width="900" height="500" title="Time Echo Game Canvas"></canvas>
+  </div>
+  <aside id="touch-controls" aria-label="Mobile game controls">
+    <div class="touch-dpad">
+      <button class="touch-btn" id="tc-left" type="button" aria-label="Move left">◀</button>
+      <button class="touch-btn" id="tc-right" type="button" aria-label="Move right">▶</button>
+    </div>
+    <div class="touch-actions">
+      <button class="touch-btn rec-btn" id="tc-record" type="button" aria-label="Record echo">●REC</button>
+      <button class="touch-btn" id="tc-jump" type="button" aria-label="Jump">▲</button>
+    </div>
+  </aside>
+</main>
+
+<!-- ══ PANELS CONTAINER (all the same panels) ═════════ -->
+<div id="panels-container">
+
+<!-- ── MAIN MENU (level select) ──────────────────────── -->
+<div class="tep-panel hidden" id="main-menu">
   <div class="panel-box" style="max-width:900px;text-align:center;">
-    <div class="hero-title">TIME ECHO</div>
-    <div class="hero-sub">Beat puzzles with your past self.</div>
-
-    <div class="menu-actions">
-       <button class="menu-btn primary"    onclick="TEP.UI._scrollToLevels()">▶ SELECT LEVEL</button>
-        <button class="menu-btn secondary"  onclick="TEP.Game.startEndless();TEP.UI.hideAll()">∞ ENDLESS</button>
-        <button class="menu-btn secondary"  onclick="TEP.Game.startEndless(TEP.getDailySeed());TEP.UI.hideAll()">📅 DAILY</button>
-        <button class="menu-btn"            onclick="TEP.UI.showShop()">🛍 SHOP</button>
-        <button class="menu-btn"            onclick="TEP.UI.showLeaderboard()">🏆 SCORES</button>
-        <button class="menu-btn"            onclick="TEP.UI.showAchievements()">🏅 TROPHIES</button>
-        <button class="menu-btn"            onclick="TEP.UI.showHelp()">❓ HOW TO PLAY</button>
-    </div>
-
-    <div class="section-title" id="level-select-title">— SELECT LEVEL —</div>
+    <button class="close-btn" onclick="TEP.UI.hideAll();showMainLaunchpad()">✕</button>
+    <div class="hero-title">SELECT LEVEL</div>
+    <div class="section-title" id="level-select-title">— CAMPAIGN —</div>
     <div id="level-grid"></div>
-
-    <div style="margin-top:18px;font-family:var(--font-pixel);font-size:7px;color:var(--muted);line-height:2;">
+    <div style="margin-top:18px;font-family:var(--px);font-size:7px;color:#556;line-height:2;">
       🎮 MOVE: A D / ← →&nbsp;&nbsp;&nbsp;JUMP: W / SPACE&nbsp;&nbsp;&nbsp;ECHO: E&nbsp;&nbsp;&nbsp;RESTART: R&nbsp;&nbsp;&nbsp;PAUSE: ESC
     </div>
   </div>
 </div>
 
-<!-- ── AUTH PANEL ─────────────────────────────────── -->
+<!-- ── AUTH PANEL ─────────────────────────────────────── -->
 <div class="tep-panel hidden" id="auth-panel">
   <div class="panel-box" style="max-width:420px;">
-    <button class="close-btn" onclick="TEP.UI.hideAll();TEP.UI.showMenu()">✕</button>
+    <button class="close-btn" onclick="TEP.UI.hideAll()">✕</button>
     <h2>ACCOUNT</h2>
-
     <div class="auth-tabs">
       <button class="auth-tab active" id="auth-login-tab" onclick="TEP.UI.switchAuthTab('login')">LOGIN</button>
       <button class="auth-tab"        id="auth-reg-tab"   onclick="TEP.UI.switchAuthTab('register')">REGISTER</button>
     </div>
-
     <form id="auth-login-form" onsubmit="TEP.UI.handleLogin(event)">
-  <div class="field-row">
-    <label>EMAIL / USERNAME</label>
-    <input 
-      type="text" 
-      id="login-identifier" 
-      placeholder="Enter email or username" 
-      required
-    />
-  </div>
-
-  <div class="field-row">
-    <label>PASSWORD</label>
-    <input 
-      type="password" 
-      id="login-pass" 
-      placeholder="••••••••" 
-      required
-    />
-  </div>
-
-  <button type="submit" class="submit-btn" id="login-btn">LOGIN</button>
-</form>
-  
-
+      <div class="field-row">
+        <label>EMAIL / USERNAME</label>
+        <input type="text" id="login-identifier" placeholder="Enter email or username" required/>
+      </div>
+      <div class="field-row">
+        <label>PASSWORD</label>
+        <input type="password" id="login-pass" placeholder="••••••••" required/>
+      </div>
+      <button type="submit" class="submit-btn" id="login-btn">LOGIN</button>
+    </form>
     <form id="auth-reg-form" class="hidden" onsubmit="TEP.UI.handleRegister(event)">
       <div class="field-row">
         <label>USERNAME</label>
@@ -224,23 +568,21 @@ document.addEventListener('click', () => {
       </div>
       <button type="submit" class="submit-btn" id="reg-btn">CREATE ACCOUNT</button>
     </form>
-
     <div id="auth-err"></div>
     <div class="auth-guest-note">
-      You can play as a guest — but <a onclick="TEP.UI.switchAuthTab('register')">register free</a>
-      to save progress &amp; appear on the worldwide leaderboard.
+      Play as a guest — or <a onclick="TEP.UI.switchAuthTab('register')">register free</a> to save progress.
     </div>
   </div>
 </div>
 
-<!-- ── SHOP PANEL ─────────────────────────────────── -->
+<!-- ── SHOP ───────────────────────────────────────────── -->
 <div class="tep-panel hidden" id="shop-panel">
   <div class="panel-box" style="max-width:800px;max-height:90vh;overflow-y:auto;">
-    <button class="close-btn" onclick="TEP.UI.showMenu()">✕</button>
+    <button class="close-btn" onclick="TEP.UI.hideAll()">✕</button>
     <h2>SHOP</h2>
     <div class="shop-coins-bar">
       <div id="shop-coins">🪙 0</div>
-      <button class="nav-btn" onclick="TEP.UI.showMenu()">← Back</button>
+      <button class="nav-btn" onclick="TEP.UI.hideAll()">← Back</button>
     </div>
     <div class="shop-section-title">👕 OUTFITS</div>
     <div class="shop-grid" id="outfit-grid"></div>
@@ -249,10 +591,10 @@ document.addEventListener('click', () => {
   </div>
 </div>
 
-<!-- ── LEADERBOARD PANEL ──────────────────────────── -->
+<!-- ── LEADERBOARD ────────────────────────────────────── -->
 <div class="tep-panel hidden" id="lb-panel">
   <div class="panel-box" style="max-width:700px;max-height:90vh;overflow-y:auto;">
-    <button class="close-btn" onclick="TEP.UI.showMenu()">✕</button>
+    <button class="close-btn" onclick="TEP.UI.hideAll()">✕</button>
     <h2>🏆 LEADERBOARD</h2>
     <div class="lb-filters">
       <label>LEVEL</label>
@@ -278,93 +620,65 @@ document.addEventListener('click', () => {
       <button class="nav-btn" onclick="TEP.UI.showLeaderboard()">↺ REFRESH</button>
     </div>
     <table class="lb-table">
-      <thead>
-        <tr><th>#</th><th>PLAYER</th><th>SCORE</th><th>TIME</th><th>ECHOES</th></tr>
-      </thead>
-      <tbody id="lb-body">
-        <tr><td colspan="5" style="color:var(--muted);padding:20px;">Sign in and play to see scores here!</td></tr>
-      </tbody>
+      <thead><tr><th>#</th><th>PLAYER</th><th>SCORE</th><th>TIME</th><th>ECHOES</th></tr></thead>
+      <tbody id="lb-body"><tr><td colspan="5" style="color:#556;padding:20px;">Sign in and play to see scores!</td></tr></tbody>
     </table>
     <div style="margin-top:16px;text-align:right;">
-      <button class="nav-btn" onclick="TEP.UI.showMenu()">← Back to Menu</button>
+      <button class="nav-btn" onclick="TEP.UI.hideAll()">← Back</button>
     </div>
   </div>
 </div>
 
-<!-- ── ACHIEVEMENTS PANEL ─────────────────────────── -->
+<!-- ── ACHIEVEMENTS ───────────────────────────────────── -->
 <div class="tep-panel hidden" id="ach-panel">
   <div class="panel-box" style="max-width:760px;max-height:90vh;overflow-y:auto;">
-    <button class="close-btn" onclick="TEP.UI.showMenu()">✕</button>
+    <button class="close-btn" onclick="TEP.UI.hideAll()">✕</button>
     <h2>🏆 ACHIEVEMENTS</h2>
     <div id="ach-grid"></div>
     <div style="margin-top:18px;text-align:right;">
-      <button class="nav-btn" onclick="TEP.UI.showMenu()">← Back</button>
+      <button class="nav-btn" onclick="TEP.UI.hideAll()">← Back</button>
     </div>
   </div>
 </div>
 
-<!-- ── HELP PANEL ─────────────────────────────────── -->
+<!-- ── HELP ──────────────────────────────────────────── -->
 <div class="tep-panel hidden" id="help-panel">
   <div class="panel-box" style="max-width:680px;">
-    <button class="close-btn" onclick="TEP.UI.showMenu()">✕</button>
+    <button class="close-btn" onclick="TEP.UI.hideAll()">✕</button>
     <h2>HOW TO PLAY</h2>
     <div class="controls-grid">
       <div>
         <div class="ctrl-row"><span class="ctrl-key">A / ←</span><span class="ctrl-desc">Move left</span></div>
         <div class="ctrl-row"><span class="ctrl-key">D / →</span><span class="ctrl-desc">Move right</span></div>
         <div class="ctrl-row"><span class="ctrl-key">W / SPACE</span><span class="ctrl-desc">Jump</span></div>
-        <div class="ctrl-row"><span class="ctrl-key">E</span><span class="ctrl-desc">Start / stop recording echo</span></div>
+        <div class="ctrl-row"><span class="ctrl-key">E</span><span class="ctrl-desc">Record echo</span></div>
       </div>
       <div>
         <div class="ctrl-row"><span class="ctrl-key">R</span><span class="ctrl-desc">Restart level</span></div>
         <div class="ctrl-row"><span class="ctrl-key">ESC</span><span class="ctrl-desc">Pause / menu</span></div>
-        <div class="ctrl-row"><span class="ctrl-key">ENTER</span><span class="ctrl-desc">Next level (on complete)</span></div>
+        <div class="ctrl-row"><span class="ctrl-key">ENTER</span><span class="ctrl-desc">Next level</span></div>
       </div>
     </div>
-    <div style="margin-top:22px;font-family:var(--font-ui);font-size:15px;color:var(--text);line-height:1.8;">
-      <p>Record up to <b>3 echoes</b> simultaneously. Each echo replays your recorded inputs from the spot you were standing.</p>
-      <p style="margin-top:10px;">Use echoes to hold <b style="color:#ffd166">switches</b>, block
-      <b style="color:#ff4455">enemies</b>, stand on <b style="color:#7efff5">pressure plates</b>,
-      or create stepping stones across gaps.</p>
-      <p style="margin-top:10px;color:var(--muted);">
-         🫧 <b style="color:#cc44ff">Echo Wisps</b> — corrupt your recording on contact<br/>
-          🤖 <b style="color:#ff8833">Chrono Sentinels</b> — rewind when hit by echoes<br/>
-          👾 <b style="color:#ff00ff">Paradox Beasts</b> — copy your last echo as a weapon<br/>
-          🟢 <b style="color:#44dd22">Temporal Slimes</b> — split into 2 when hit<br/>
-          👤 <b style="color:#aa44ff">Void Shades</b> — invisible when you stop recording
+    <div style="margin-top:22px;font-family:var(--font-ui,monospace);font-size:14px;color:#ccc;line-height:1.8;">
+      <p>Record up to <b>3 echoes</b> simultaneously. Each echo replays your recorded inputs.</p>
+      <p style="margin-top:10px;">Use echoes to hold <b style="color:#ffd166">switches</b>, block <b style="color:#ff4455">enemies</b>, and stand on <b style="color:#7efff5">pressure plates</b>.</p>
+      <p style="margin-top:10px;color:#556;">
+        🫧 <b style="color:#cc44ff">Wisps</b> — corrupt recordings<br/>
+        🤖 <b style="color:#ff8833">Sentinels</b> — rewind when hit<br/>
+        👾 <b style="color:#ff00ff">Beasts</b> — copy your echo as a weapon<br/>
+        🟢 <b style="color:#44dd22">Slimes</b> — split when hit<br/>
+        👤 <b style="color:#aa44ff">Shades</b> — invisible when you stop recording
       </p>
     </div>
     <div style="margin-top:18px;text-align:right;">
-      <button class="nav-btn" onclick="TEP.UI.showMenu()">← Back</button>
+      <button class="nav-btn" onclick="TEP.UI.hideAll()">← Back</button>
     </div>
   </div>
 </div>
 
-</div><!-- End panels-container -->
+</div><!-- end panels-container -->
 
-<!-- ══ PWA INSTALL BANNER ════════════════════════════ -->
-<div id="pwa-banner">
-  <div>📲 INSTALL TIME ECHO</div>
-  <div style="color:#5a7090;font-size:6px;margin-top:4px">Play offline · Full screen · No browser UI</div>
-  <div id="pwa-banner-btns">
-    <button id="pwa-install-btn" type="button">INSTALL APP</button>
-    <button id="pwa-dismiss-btn" type="button">LATER</button>
-  </div>
-</div>
-
-<!-- ══ TOAST ══════════════════════════════════════════ -->
-<div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
-
-<!-- ══ FOOTER ════════════════════════════════════════ -->
-<footer id="site-footer" role="contentinfo">
-  <div class="footer-content">
-    <p><strong>TIME ECHO PLATFORMER</strong> — Beat puzzles with your past self.</p>
-  </div>
-</footer>
-
-</div><!-- End app-container -->
-
-<!-- ══ SCRIPTS (order matters) ══════════════════════ -->
+<!-- ══ SCRIPTS ════════════════════════════════════════ -->
 <script src="/config.js"></script>
 <script src="/supabase-client.js"></script>
 <script src="/auth.js"></script>
@@ -376,34 +690,247 @@ document.addEventListener('click', () => {
 <script src="/ui.js"></script>
 
 <script>
-// ── PWA: Register Service Worker ────────────────────
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(reg => console.log('[PWA] SW registered:', reg.scope))
-      .catch(err => console.warn('[PWA] SW failed:', err));
-  });
+/* ── Panorama background renderer ─────────────────────
+   Draws a slowly rotating pixel-art sky scene with
+   floating platforms, stars, and lava glow at the bottom.
+*/
+(function() {
+  const canvas = document.getElementById('panorama-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, t = 0;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Seeded RNG for consistent star positions
+  function rng(seed) {
+    let s = seed;
+    return function() {
+      s = (s * 16807 + 0) % 2147483647;
+      return (s - 1) / 2147483646;
+    };
+  }
+
+  const starRng = rng(12345);
+  const STARS = Array.from({length: 120}, (_, i) => ({
+    x: starRng(),
+    y: starRng() * 0.65,
+    size: i % 7 === 0 ? 3 : i % 3 === 0 ? 2 : 1,
+    twinkle: starRng() * Math.PI * 2,
+    speed: 0.3 + starRng() * 1.2,
+  }));
+
+  // Platform silhouettes
+  const PLATFORMS = [
+    {x:0.08, y:0.62, w:0.12, h:0.04, depth:1},
+    {x:0.22, y:0.52, w:0.09, h:0.035, depth:2},
+    {x:0.38, y:0.44, w:0.11, h:0.04, depth:1.5},
+    {x:0.55, y:0.58, w:0.08, h:0.03, depth:2},
+    {x:0.70, y:0.48, w:0.13, h:0.04, depth:1},
+    {x:0.88, y:0.55, w:0.10, h:0.035, depth:1.8},
+    {x:0.45, y:0.32, w:0.08, h:0.03, depth:3},
+    {x:0.15, y:0.38, w:0.09, h:0.03, depth:3},
+    {x:0.78, y:0.35, w:0.07, h:0.025, depth:3},
+  ];
+
+  function hill(camX, baseY, amp, freq, parallax) {
+    const off = camX * parallax;
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    for (let x = 0; x <= W + 8; x += 4) {
+      const y = baseY + Math.sin((x + off) * freq) * amp + Math.sin((x + off) * freq * 2.3) * amp * 0.35;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, H);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function frame() {
+    t += 0.004;
+    const camX = t * 60; // slow pan
+
+    // Sky gradient — dark blue night sky (this is the menu BG, not the game)
+    const sky = ctx.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0,   '#000814');
+    sky.addColorStop(0.4, '#040d22');
+    sky.addColorStop(0.7, '#080518');
+    sky.addColorStop(1,   '#0a0000');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, H);
+
+    // Stars (parallax slow)
+    STARS.forEach(s => {
+      const sx = ((s.x - (t * s.speed * 0.008) % 1 + 1) % 1) * W;
+      const sy = s.y * H;
+      const alpha = 0.4 + Math.sin(t * 1.5 + s.twinkle) * 0.35;
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(Math.floor(sx), Math.floor(sy), s.size, s.size);
+    });
+    ctx.globalAlpha = 1;
+
+    // Nebula wisps
+    const pulse = (Math.sin(t * 0.8) + 1) * 0.5;
+    ctx.fillStyle = `rgba(100,20,200,${0.025 + pulse * 0.015})`;
+    ctx.fillRect(W * 0.1, H * 0.05, W * 0.4, H * 0.45);
+    ctx.fillStyle = `rgba(0,80,200,${0.02 + pulse * 0.01})`;
+    ctx.fillRect(W * 0.55, H * 0.08, W * 0.4, H * 0.40);
+
+    // Far hills
+    ctx.fillStyle = '#0a0520';
+    hill(camX, H * 0.58, H * 0.14, 0.003, 0.04);
+    ctx.fillStyle = '#100a38';
+    hill(camX, H * 0.66, H * 0.12, 0.005, 0.10);
+    ctx.fillStyle = '#180e48';
+    hill(camX, H * 0.74, H * 0.10, 0.007, 0.22);
+
+    // Platform silhouettes with parallax
+    PLATFORMS.forEach(p => {
+      const parallax = p.depth * 0.06;
+      const px = ((p.x - (t * parallax * 0.3) % 1 + 1) % 1) * W;
+      const py = p.y * H;
+      const pw = p.w * W;
+      const ph = p.h * H;
+      const darkness = 0.08 + p.depth * 0.04;
+      ctx.fillStyle = `rgba(20,10,50,${0.7 + darkness})`;
+      ctx.fillRect(Math.floor(px), Math.floor(py + ph * 0.4), Math.floor(pw), Math.floor(ph * 0.7));
+      ctx.fillStyle = `rgba(30,15,60,${0.7})`;
+      ctx.fillRect(Math.floor(px), Math.floor(py), Math.floor(pw), Math.floor(ph * 0.5));
+      // Top edge glow (like platform light)
+      ctx.fillStyle = `rgba(120,60,255,${0.15})`;
+      ctx.fillRect(Math.floor(px), Math.floor(py), Math.floor(pw), 2);
+    });
+
+    // Lava glow at bottom
+    const lavaPulse = (Math.sin(t * 2.2) + 1) * 0.5;
+    ctx.fillStyle = `rgba(255,50,0,${0.05 + lavaPulse * 0.04})`;
+    ctx.fillRect(0, H * 0.85, W, H * 0.15);
+    ctx.fillStyle = `rgba(255,100,0,${0.08 + lavaPulse * 0.06})`;
+    ctx.fillRect(0, H * 0.91, W, H * 0.09);
+    ctx.fillStyle = `rgba(255,150,20,${0.12 + lavaPulse * 0.08})`;
+    ctx.fillRect(0, H * 0.96, W, H * 0.04);
+
+    // Ground silhouette
+    ctx.fillStyle = '#080210';
+    ctx.fillRect(0, H * 0.88, W, H * 0.12);
+
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ── Floating pixel particles ─────────────────────────── */
+(function() {
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const COLORS = ['#00d4ff','#aa44ff','#ff4455','#ffd700','#44cc22','#ff8833'];
+  const parts = Array.from({length: 28}, (_, i) => ({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    size: 2 + Math.floor(Math.random() * 4),
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: -0.2 - Math.random() * 0.5,
+    color: COLORS[i % COLORS.length],
+    alpha: 0.2 + Math.random() * 0.4,
+    life: Math.random(),
+  }));
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    parts.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.life += 0.003;
+      if (p.y < -10) { p.y = H + 5; p.x = Math.random() * W; p.life = 0; }
+      const a = p.alpha * (0.5 + Math.sin(p.life * 3) * 0.5);
+      ctx.globalAlpha = a;
+      ctx.fillStyle = p.color;
+      ctx.fillRect(Math.floor(p.x), Math.floor(p.y), p.size, p.size);
+    });
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ── Splash texts ────────────────────────────────────── */
+const SPLASH_TEXTS = [
+  'Now with Echoes!', 'Time is a flat circle!', 'Your past self is judging you.',
+  'Paradox-proof!', '99% echo-free!', 'Speed-running the timeline!',
+  'More lava than necessary!', 'Wisps not included.', 'Not responsible for paradoxes.',
+  'Your echo is watching.', '3 echoes walk into a bar...', 'Totally certified time travel!',
+  'Gravity: still a thing.', 'The lava is decorative. (It\'s not.)',
+];
+const splash = document.getElementById('splash');
+if (splash) {
+  splash.textContent = SPLASH_TEXTS[Math.floor(Math.random() * SPLASH_TEXTS.length)];
 }
 
-// ── PWA: Install prompt ─────────────────────────────
+/* ── Local toast (before UI loads) ──────────────────── */
+function showToastLocal(msg, color) {
+  if (window.TEP?.UI?.showToast) { TEP.UI.showToast(msg, color); return; }
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg; t.style.background = color||'#7efff5';
+  t.style.color='#000'; t.style.opacity='1'; t.style.transform='translateY(0)';
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateY(-16px)'; }, 2500);
+}
+
+/* ── Show/hide main launchpad vs game ────────────────── */
+function showMainLaunchpad() {
+  document.getElementById('main-game').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('title-block').style.display = '';
+  document.getElementById('menu-container').style.display = 'flex';
+  document.getElementById('stats-bar').style.display = 'flex';
+}
+
+/* ── Patch TEP.Game to show canvas when level starts ─── */
+function patchGameForLaunchpad() {
+  if (!window.TEP?.Game) return;
+  const origStart = TEP.Game.startLevel?.bind(TEP.Game);
+  const origEndless = TEP.Game.startEndless?.bind(TEP.Game);
+  const hideMenu = () => {
+    document.getElementById('main-game').style.display = 'block';
+    document.getElementById('app').style.display = 'none';
+    document.querySelectorAll('.tep-panel').forEach(p=>p.classList.add('hidden'));
+  };
+  if (origStart) TEP.Game.startLevel = (...a) => { hideMenu(); origStart(...a); };
+  if (origEndless) TEP.Game.startEndless = (...a) => { hideMenu(); origEndless(...a); };
+}
+
+/* ── Update stats bar ────────────────────────────────── */
+function updateStatsBar() {
+  const lvl = TEP.Auth?.getLevel?.() || 1;
+  const coins = TEP.Auth?.getCoins?.() || 0;
+  const profile = TEP.Auth?.getProfile?.();
+  const themeKey = TEP.LEVELS?.[lvl-1]?.theme || 'cave';
+  const themeName = TEP.CONFIG?.THEMES?.[themeKey]?.name || themeKey;
+  document.getElementById('stat-level').textContent = `LVL ${lvl}`;
+  document.getElementById('stat-coins').textContent = `🪙 ${coins}`;
+  document.getElementById('stat-theme').textContent = themeName;
+}
+
+/* ── PWA install ────────────────────────────────────── */
 let _pwaPrompt = null;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  _pwaPrompt = e;
-  // Show banner only if not already dismissed
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); _pwaPrompt = e;
   if (!localStorage.getItem('tep_pwa_dismissed')) {
-    setTimeout(() => {
-      document.getElementById('pwa-banner')?.classList.add('show');
-    }, 8000); // show after 8s of play
+    setTimeout(() => document.getElementById('pwa-banner')?.classList.add('show'), 8000);
   }
 });
 document.getElementById('pwa-install-btn')?.addEventListener('click', () => {
   if (_pwaPrompt) {
     _pwaPrompt.prompt();
-    _pwaPrompt.userChoice.then(() => {
-      document.getElementById('pwa-banner')?.classList.remove('show');
-      _pwaPrompt = null;
-    });
+    _pwaPrompt.userChoice.then(() => { document.getElementById('pwa-banner')?.classList.remove('show'); _pwaPrompt = null; });
   }
 });
 document.getElementById('pwa-dismiss-btn')?.addEventListener('click', () => {
@@ -411,11 +938,11 @@ document.getElementById('pwa-dismiss-btn')?.addEventListener('click', () => {
   localStorage.setItem('tep_pwa_dismissed', '1');
 });
 
-// ── Mobile: hook touch controls ─────────────────────
+/* ── Touch controls ─────────────────────────────────── */
 function hookTouch(id, key) {
   const el = document.getElementById(id);
   if (!el) return;
-  el.addEventListener('touchstart', e => { e.preventDefault(); TEP.Game.keys[key] = true; }, { passive: false });
+  el.addEventListener('touchstart', e => { e.preventDefault(); TEP.Game.keys[key] = true; }, {passive:false});
   el.addEventListener('touchend',   () => { TEP.Game.keys[key] = false; });
   el.addEventListener('touchcancel',() => { TEP.Game.keys[key] = false; });
 }
@@ -426,19 +953,35 @@ const recBtn = document.getElementById('tc-record');
 if (recBtn) {
   recBtn.addEventListener('touchstart', e => {
     e.preventDefault();
-    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'e' }));
-    setTimeout(() => window.dispatchEvent(new KeyboardEvent('keyup', { key: 'e' })), 80);
-  }, { passive: false });
+    window.dispatchEvent(new KeyboardEvent('keydown', {key:'e'}));
+    setTimeout(()=>window.dispatchEvent(new KeyboardEvent('keyup',{key:'e'})),80);
+  }, {passive:false});
 }
 
-// ── Keyboard shortcut while playing ─────────────────
+/* ── Keyboard ────────────────────────────────────────── */
 window.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && TEP.Game.getState() === 'menu') TEP.UI.hideAll();
+  if (e.key === 'Escape' && TEP.Game.getState?.() === 'menu') { TEP.UI.hideAll(); }
 });
-</script>
 
-<script>
-/* ── Bootstrap ─────────────────────────────────── */
+/* ── BGM ─────────────────────────────────────────────── */
+document.addEventListener('click', () => {
+  if (!window.__bgmStarted) {
+    window.__bgmStarted = true;
+    const audio = new Audio('time-capsule.mp3');
+    audio.loop = true; audio.volume = 0.5;
+    audio.play().catch(()=>{});
+    window.__bgm = audio;
+  }
+}, {once:true});
+
+/* ── PWA Service Worker ──────────────────────────────── */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  });
+}
+
+/* ── Bootstrap ───────────────────────────────────────── */
 (async () => {
   const canvas = document.getElementById('game-canvas');
 
@@ -446,30 +989,38 @@ window.addEventListener('keydown', e => {
     try {
       const r = await fetch('levels.js');
       const code = await r.text();
-      const TEP = window.TEP;
       eval(code);
-    } catch(e) {
-      console.error('Failed to load levels:', e);
-      TEP.LEVELS = [];
-    }
+    } catch(e) { console.error('Failed to load levels:', e); TEP.LEVELS = []; }
   }
 
   if (window.TEP?.Sound?.init) {
-    try { TEP.Sound.init(); } catch(e) { console.warn('Sound init failed', e); }
+    try { TEP.Sound.init(); } catch(e) {}
   }
 
   const restored = await TEP.Auth.init();
   if (!restored) TEP.Auth.initGuest();
 
   TEP.Game.init(canvas);
-  TEP.UI.showMenu();
-  TEP.UI.updateNavBar();
 
-  document.getElementById('logout-btn').addEventListener('click', async () => {
+  // Patch game to show/hide launchpad
+  patchGameForLaunchpad();
+
+  // Override TEP.UI.showMenu to show level select panel instead of hiding launchpad
+  const origShowMenu = TEP.UI.showMenu.bind(TEP.UI);
+  TEP.UI.showMenu = () => {
+    // If we're on the launchpad (not in-game), just show the panel
+    origShowMenu();
+  };
+
+  TEP.UI.updateNavBar();
+  updateStatsBar();
+
+  document.getElementById('logout-btn')?.addEventListener('click', async () => {
     await TEP.Auth.logout();
     TEP.UI.updateNavBar();
-    TEP.UI.showMenu();
-    TEP.UI.showToast('👋 Logged out');
+    TEP.UI.hideAll();
+    updateStatsBar();
+    showToastLocal('👋 Logged out');
   });
 })();
 </script>
