@@ -110,29 +110,6 @@ TEP.Renderer = (() => {
     const t = Date.now() * 0.006;
     const pulse = 0.5 + Math.sin(t * 2) * 0.5;
 
-    // ── LARGE AMBIENT GLOW — emitted light onto scene ──
-    // Outermost glow: very wide, very subtle
-    ctx.fillStyle = `rgba(255, 90, 0, ${0.028 + pulse * 0.018})`;
-    ctx.fillRect(sx - 180, sy - 160, lv.w + 360, lv.h + 260);
-
-    ctx.fillStyle = `rgba(255, 70, 0, ${0.045 + pulse * 0.025})`;
-    ctx.fillRect(sx - 120, sy - 110, lv.w + 240, lv.h + 190);
-
-    ctx.fillStyle = `rgba(255, 60, 0, ${0.065 + pulse * 0.030})`;
-    ctx.fillRect(sx - 75, sy - 70, lv.w + 150, lv.h + 130);
-
-    ctx.fillStyle = `rgba(255, 50, 0, ${0.09 + pulse * 0.04})`;
-    ctx.fillRect(sx - 40, sy - 38, lv.w + 80, lv.h + 80);
-
-    ctx.fillStyle = `rgba(255, 40, 0, ${0.14 + pulse * 0.06})`;
-    ctx.fillRect(sx - 18, sy - 16, lv.w + 36, lv.h + 40);
-
-    // Upward heat glow (light rises)
-    ctx.fillStyle = `rgba(255, 100, 0, ${0.07 + pulse * 0.04})`;
-    ctx.fillRect(sx - 30, sy - 80, lv.w + 60, 80);
-
-    ctx.fillStyle = `rgba(255, 130, 20, ${0.04 + pulse * 0.025})`;
-    ctx.fillRect(sx - 20, sy - 140, lv.w + 40, 65);
 
     // ── CORE BODY ──
     ctx.fillStyle = '#6a1200';
