@@ -446,11 +446,11 @@ TEP.Renderer = (() => {
     // Subtle glow (outer + inner layered aura)
 ctx.globalAlpha = 0.06;
 ctx.fillStyle = echo.color;
-ctx.fillRect(sx - 36, sy - 36, actor.w + 18, actor.h + 18);
+ctx.fillRect(sx - 360, sy - 360, actor.w + 18, actor.h + 18);
 
 ctx.globalAlpha = 0.08;
 ctx.fillStyle = echo.color;
-ctx.fillRect(sx - 60, sy - 60, actor.w + 30, actor.h + 30);
+ctx.fillRect(sx - 600, sy - 600, actor.w + 30, actor.h + 30);
 
 ctx.globalAlpha = 1;
 
