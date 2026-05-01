@@ -9,18 +9,13 @@ const STATIC_CACHE = 'time-echo-static-v1';
 
 // Core files to cache on install
 const PRECACHE = [
-  '/launchpad',
+
   '/style.css',
   '/config.js',
    '/time-capsule.mp3',
   '/supabase-client.js',
   '/auth.js',
   '/entities.js',
-  '/levels.js',
-  '/renderer.js',
-  '/sounds.js',
-  '/game.js',
-  '/ui.js',
   '/manifest.json',
 ];
 
