@@ -1,0 +1,9 @@
+{
+  "appId": "com.timeecho.game",
+  "appName": "TimeEcho",
+  "webDir": "web",
+  "server": {
+    "url": "https://yourgame.vercel.app",
+    "cleartext": true
+  }
+}
