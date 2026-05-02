@@ -188,27 +188,6 @@ button{cursor:pointer;font-family:var(--font-pixel)}
   letter-spacing:3px;margin-bottom:20px;
 }
 
-#splash:hover {
-  background: linear-gradient(
-    90deg,
-    #fff6b0 0%,
-    #ffd700 25%,
-    #ffb300 50%,
-    #ffd700 75%,
-    #fff6b0 100%
-  );
-
-  -webkit-background-clip: text;
-  background-clip: text;
-
-  -webkit-text-fill-color: transparent;
-
-  text-shadow: 
-    2px 2px 0 #664400,
-    0 0 25px rgba(255,215,0,0.9),
-    0 0 50px rgba(255,215,0,0.5);
-}
-
 /* Menu action row — horizontal pill buttons */
 .menu-actions{
   display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
