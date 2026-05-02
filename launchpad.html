@@ -1124,16 +1124,87 @@
 })();
 
 /* ── Splash texts ─────────────────────────────────────── */
-const SPLASH_TEXTS = [
-  'Now with Echoes!', 'Time is a flat circle!', 'Your past self is judging you.',
-  'Paradox-proof!', '99% echo-free!', 'Speed-running the timeline!',
-  'More lava than necessary!', 'Wisps not included.', 'Not responsible for paradoxes.',
-  'Your echo is watching.', '3 echoes walk into a bar...', 'Totally certified time travel!',
-  'Gravity: still a thing.', 'The lava is decorative. (It\'s not.)',
+const SPLASH_COMMON = [
+  'Now with Echoes!', 
+  'Time is a flat circle!', 
+  'Your past self is judging you.',
+  'Paradox-proof!', 
+  '99% echo-free!', 
+  'Speed-running the timeline!',
+  'More lava than necessary!', 
+  'Wisps not included.', 
+  'Not responsible for paradoxes.',
+  'Your echo is watching.', 
+  '3 echoes walk into a bar...', 
+  'Totally certified time travel!',
+  'Gravity: still a thing.', 
+  'The lava is decorative. (It\'s not.)',
+
+  'You vs You vs You.',
+  'Past mistakes included for free.',
+  'Fix it. Break it. Repeat.',
+  'Time doesn’t heal. It replays.',
+  'Echoes remember everything.',
+  'Skill issue across timelines.',
+  'Outrun your own decisions.',
+  'Desync detected.',
+  'Timeline integrity: questionable.',
+  'You can’t undo—only outplay.',
+  'Every frame is recorded.',
+  'History will repeat. Literally.',
+];
+
+const SPLASH_RARE = [
+  'Your best run already happened.',
+  'Your ghost is faster than you.',
+  'Parallel you is laughing.',
+  'You already tried that.',
+  'This felt easier last timeline.',
+  'Your inputs are permanent.',
+  'Outplay your past. Or join it.',
+  'One move. Infinite consequences.',
+  'Cause meets effect… eventually.',
+  'Multiple yous. Same problem.',
+];
+
+const SPLASH_ULTRA = [
+  'TODO: remove this splash.',
+  'who let this into production?',
+  'console.log("why")',
+  'it works on my machine.',
+  'undefined behavior achieved.',
+  'fix later (never).',
+  'temporary solution™',
+  'magic number strikes again.',
+  'this is definitely intentional.',
+  '// don’t touch this',
+  'refactor? nah.',
+  'one more patch should fix it.',
+  'edge case? what edge case?',
+  'ship it.',
+  'if it compiles, it’s done.',
+  '99 little bugs in the code…',
+  'works perfectly. do not test.',
+  'this seemed like a good idea at 2am.',
+  'not a bug. a feature.',
+  'try/catch and pray.',
 ];
 const splash = document.getElementById('splash');
+
+function pick(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function getSplashText() {
+  const roll = Math.random();
+
+  if (roll < 0.01) return pick(SPLASH_ULTRA); // 1%
+  if (roll < 0.09) return pick(SPLASH_RARE);  // next 8%
+  return pick(SPLASH_COMMON);                // 91%
+}
+
 if (splash) {
-  splash.textContent = SPLASH_TEXTS[Math.floor(Math.random() * SPLASH_TEXTS.length)];
+  splash.textContent = getSplashText();
 }
 
 /* ── Local toast ─────────────────────────────────────── */
