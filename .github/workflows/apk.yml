@@ -35,23 +35,28 @@ jobs:
 
       - name: 📦 Install dependencies
         run: |
-          echo "Installing dependencies..."
+          echo "Installing base dependencies..."
           npm install
 
-      - name: ⚡ Install Capacitor + Android
+      - name: ⚡ Install Capacitor (LOCKED VERSIONS)
         run: |
-          echo "Installing Capacitor..."
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+          echo "Installing Capacitor v6 (compatible set)..."
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
 
       - name: 🔧 Sync Capacitor
         run: |
           echo "Syncing Capacitor..."
           npx cap sync
 
-      - name: 🤖 Add Android platform
+      - name: 🤖 Add Android platform (only if missing)
         run: |
-          echo "Adding Android platform..."
-          npx cap add android
+          echo "Checking Android platform..."
+          if [ ! -d "android" ]; then
+            echo "Adding Android platform..."
+            npx cap add android
+          else
+            echo "Android already exists ✔️"
+          fi
 
       - name: 🏗️ Build APK
         run: |
@@ -66,3 +71,4 @@ jobs:
         with:
           name: timeecho-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          
