@@ -7,4 +7,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "Checking if game loads..."
-      - run: curl -I https://yourgame.vercel.app
+      - run: curl -I https://echotime.vercel.app
