@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: 20
 
-      - name: ☕ Setup Java (needed for Android)
+      - name: ☕ Setup Java (Android needs this)
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
@@ -38,12 +38,12 @@ jobs:
           echo "Installing dependencies..."
           npm install
 
-      - name: ⚡ Install Capacitor
+      - name: ⚡ Install Capacitor + Android
         run: |
           echo "Installing Capacitor..."
-          npm install @capacitor/core @capacitor/cli
+          npm install @capacitor/core @capacitor/cli @capacitor/android
 
-      - name: 🔧 Init + Sync
+      - name: 🔧 Sync Capacitor
         run: |
           echo "Syncing Capacitor..."
           npx cap sync
