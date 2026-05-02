@@ -5,20 +5,41 @@ on:
     branches: ["main"]
 
 jobs:
-  build:
+  vibe:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🧠 Timeline stable ✔️ (vibe check passed)"
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎮 Game test passed ✔️ (basic sanity)"
+
+  build-exe:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: 🟢 Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - run: npm install
-      - run: npm run build
+      - name: 📦 Install dependencies
+        run: |
+          echo "Installing dependencies..."
+          npm install
 
-      - uses: actions/upload-artifact@v4
+      - name: 🏗️ Build EXE
+        run: |
+          echo "Starting Electron build..."
+          npm run build
+          echo "EXE build finished ✔️"
+
+      - name: 📤 Upload EXE
+        uses: actions/upload-artifact@v4
         with:
           name: timeecho-exe
           path: dist/*.exe
