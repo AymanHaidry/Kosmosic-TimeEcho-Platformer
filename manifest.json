@@ -2,7 +2,7 @@
   "name": "Time Echo Platformer",
   "short_name": "TimeEcho",
   "description": "Beat puzzles with your past self. A pixel-art time-echo platformer.",
-  "start_url": "/launchpad",
+  "start_url": "/destini",
   "scope": "/",
   "display": "standalone",
   "background_color": "#08080f",
