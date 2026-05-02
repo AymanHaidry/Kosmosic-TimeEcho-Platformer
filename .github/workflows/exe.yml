@@ -8,12 +8,12 @@ jobs:
   vibe:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🧠 Timeline stable ✔️ (vibe check passed)"
+      - run: echo "🧠 Timeline stable ✔️ (EXE lane)"
 
   test:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🎮 Game test passed ✔️ (basic sanity)"
+      - run: echo "🎮 Game logic reachable ✔️ (EXE sanity)"
 
   build-exe:
     runs-on: windows-latest
@@ -34,7 +34,7 @@ jobs:
 
       - name: 🏗️ Build EXE
         run: |
-          echo "Starting Electron build..."
+          echo "Building TimeEcho EXE..."
           npm run build
           echo "EXE build finished ✔️"
 
