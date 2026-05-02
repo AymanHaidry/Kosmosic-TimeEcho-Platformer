@@ -2,19 +2,29 @@
   "name": "timeecho",
   "version": "1.0.0",
   "main": "main.js",
+
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder"
+    "build": "electron-builder --publish never",
+    "build:web": "echo \"no build step yet\""
   },
+
   "devDependencies": {
     "electron": "^30.0.0",
     "electron-builder": "^24.0.0"
   },
+
+  "dependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/cli": "^6.0.0"
+  },
+
   "build": {
     "appId": "com.timeecho.game",
     "productName": "TimeEcho",
     "win": {
       "target": "nsis"
-    }
+    },
+    "publish": null
   }
 }
