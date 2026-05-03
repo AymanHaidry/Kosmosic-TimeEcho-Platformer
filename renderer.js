@@ -382,18 +382,6 @@ TEP.Renderer = (() => {
     const sy = py(actor.y - camY);
     if (sx + actor.w < -10 || sx > W + 10) return;
 
-    ctx.globalAlpha = 0.10;
-    ctx.fillStyle = echo.color;
-    ctx.fillRect(sx - 40, sy - 40, actor.w + 80, actor.h + 80);
-
-    ctx.globalAlpha = 0.07;
-    ctx.fillRect(sx - 70, sy - 70, actor.w + 140, actor.h + 140);
-
-    ctx.globalAlpha = 0.04;
-    ctx.fillRect(sx - 110, sy - 110, actor.w + 220, actor.h + 220);
-
-    ctx.globalAlpha = 1;
-
     drawActorTrail(actor, camX, camY, echo.color);
     drawEchonaut(sx, sy, echo.color, actor.facingRight, 0, 0.80);
 
@@ -447,27 +435,10 @@ TEP.Renderer = (() => {
     ctx.restore();
   }
 
-  // ── Enemy ambient glow helper ─────────────────────────
-  // Draws multi-layer soft light emission around an enemy
+  // ── Enemy ambient glow helper (disabled) ──────────────
   function _drawEnemyGlow(sx, sy, w, h, color, intensity, pulse) {
-    // intensity: 0.0–1.0 scale, pulse: 0.0–1.0 animated value
-    const p = pulse || 0.5;
-    const base = intensity || 0.5;
-
-    // 4 expanding layers, each more transparent
-    const layers = [
-      { pad: 28, alpha: base * (0.13 + p * 0.07) },
-      { pad: 55, alpha: base * (0.075 + p * 0.04) },
-      { pad: 90, alpha: base * (0.042 + p * 0.022) },
-      { pad: 140, alpha: base * (0.020 + p * 0.012) },
-    ];
-
-    for (const l of layers) {
-      ctx.fillStyle = color;
-      ctx.globalAlpha = l.alpha;
-      ctx.fillRect(sx - l.pad, sy - l.pad, w + l.pad * 2, h + l.pad * 2);
-    }
-    ctx.globalAlpha = 1;
+    // Glow removed
+  }
   }
 
   // ── Enemy drawings ────────────────────────────────────
