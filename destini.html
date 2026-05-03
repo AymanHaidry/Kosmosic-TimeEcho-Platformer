@@ -1050,5 +1050,11 @@ if ('serviceWorker' in navigator) {
   });
 })();
 </script>
+  <script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const banner = document.getElementById('pwa-banner');
+    if (banner) banner.classList.add('show');
+  });
+</script>
 </body>
 </html>
