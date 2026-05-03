@@ -272,6 +272,7 @@ button { cursor: pointer; font-family: var(--font-pixel); }
   transform: translateX(-40%) rotate(-15deg);
   font-family: var(--font-pixel);
   font-size: clamp(7px, 1.3vw, 11px);
+   z-index: 200;
   color: #ffd700;
   text-shadow: 2px 2px 0 #664400, 0 0 20px rgba(255,200,0,0.6);
   animation: splashPop 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both, 
@@ -1061,6 +1062,7 @@ button { cursor: pointer; font-family: var(--font-pixel); }
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
   border: 1px solid rgba(255,255,255,0.20);
+  radius: 20px;
   border-top-color: rgba(255,255,255,0.40);
   box-shadow: 0 16px 48px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.20);
   color: #cfe8ff;
