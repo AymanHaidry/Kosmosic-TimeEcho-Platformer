@@ -161,11 +161,11 @@ button { cursor: pointer; font-family: var(--font-pixel); }
   z-index: 300;
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 20px;
-  height: 52px;
+  height: 45px;
   /* LIQUID GLASS */
   background: rgba(4,4,20,0.35);
-  backdrop-filter: var(--glass-blur-heavy);
-  -webkit-backdrop-filter: var(--glass-blur-heavy);
+  backdrop-filter: var(--glas-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border-bottom: 1px solid rgba(255,255,255,0.12);
   box-shadow:
     0 1px 0 rgba(255,255,255,0.08) inset,
@@ -173,7 +173,7 @@ button { cursor: pointer; font-family: var(--font-pixel); }
 }
 
 #top-bar .logo, #nav .logo {
-  font-family: var(--font-pixel); font-size: 10px;
+  font-family: var(--font-pixel); font-size: 14px;
   color: var(--accent);
   text-shadow: 0 0 12px var(--accent), 0 0 24px rgba(126,255,245,0.3);
   letter-spacing: 1px; cursor: pointer; white-space: nowrap;
