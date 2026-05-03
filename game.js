@@ -755,7 +755,11 @@ TEP.Game = (() => {
     if (line) lines.push(line);
     lines.forEach((l, i) => ctx.fillText(l, W/2, H/2 - 10 + i * 18));
 
-    // Controls hint — handled by HTML overlay
+    // Controls hint
+    ctx.fillStyle = '#888';
+    ctx.font = '9px "Press Start 2P",monospace';
+    ctx.fillText('[R] RESTART', W/2, H/2 + 55);
+    ctx.fillText('[ESC] MENU', W/2, H/2 + 75);
     ctx.textAlign = 'left';
   }
 
@@ -763,15 +767,46 @@ TEP.Game = (() => {
   function drawPauseScreen() {
     ctx.fillStyle = 'rgba(0,5,20,0.82)';
     ctx.fillRect(0, 0, W, H);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#7efff5';
+    ctx.font = 'bold 22px "Press Start 2P",monospace';
+    ctx.fillText('PAUSED', W/2, H/2 - 40);
+    ctx.fillStyle = '#cfe8ff';
+    ctx.font = '9px "Press Start 2P",monospace';
+    ctx.fillText('[ESC] RESUME', W/2, H/2 + 5);
+    ctx.fillText('[R] RESTART', W/2, H/2 + 30);
+    ctx.textAlign = 'left';
   }
 
   // ── Complete screen ────────────────────────────────
   function drawCompleteScreen() {
     const d = completionData;
+    // Emotional particle burst
     R.spawnParticles(player.x + 11, player.y + 19, '#ffd700', 3, 2);
-    ctx.fillStyle = 'rgba(0,20,10,0.88)';
-    ctx.fillRect(0, 0, W, H);
-    // Update HTML overlay with stats
+
+    ctx.fillStyle = 'rgba(0,20,10,0.92)';
+    ctx.fillRect(W/2 - 240, H/2 - 130, 480, 260);
+    ctx.strokeStyle = '#2ecc71';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(W/2 - 240, H/2 - 130, 480, 260);
+    // Glow
+    ctx.shadowColor = '#2ecc71';
+    ctx.shadowBlur = 20;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#2ecc71';
+    ctx.font = 'bold 18px "Press Start 2P",monospace';
+    ctx.fillText('LEVEL CLEAR!', W/2, H/2 - 88);
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#ffd700';
+    ctx.font = 'bold 15px "Press Start 2P",monospace';
+    ctx.fillText(`SCORE: ${d.score}`, W/2, H/2 - 55);
+    ctx.fillStyle = '#cfe8ff';
+    ctx.font = '9px "Press Start 2P",monospace';
+    ctx.fillText(`TIME: ${d.timeSec}s`, W/2 - 100, H/2 - 20);
+    ctx.fillText(`ECHOES: ${d.echoes}`, W/2, H/2 - 20);
+    ctx.fillText(`COINS: ${d.coins}`, W/2 + 100, H/2 - 20);
+
+    // Emotional message
     const emotionalMsgs = [
       "Your echo carried you here. Don't forget it.",
       "Time bent for you. Just this once.",
@@ -780,22 +815,21 @@ TEP.Game = (() => {
       "You and your echoes — unstoppable.",
     ];
     const emsg = emotionalMsgs[levelNum % emotionalMsgs.length];
-    const statsEl = document.getElementById('mob-complete-stats');
-    if (statsEl) statsEl.innerHTML =
-      `<div>SCORE: <span style="color:#ffd700">${d.score}</span></div>` +
-      `<div>TIME: ${d.timeSec}s &nbsp; ECHOES: ${d.echoes} &nbsp; COINS: ${d.coins}</div>` +
-      `<div style="color:rgba(200,230,255,0.55);font-size:7px;margin-top:4px">${emsg}</div>`;
+    ctx.fillStyle = 'rgba(200,230,255,0.6)';
+    ctx.font = '7px "Press Start 2P",monospace';
+    ctx.fillText(emsg, W/2, H/2 + 20);
+
+    ctx.fillStyle = '#7efff5';
+    ctx.font = '9px "Press Start 2P",monospace';
+    ctx.fillText('[ENTER] NEXT LEVEL', W/2, H/2 + 60);
+    ctx.fillText('[R] REPLAY   [ESC] MENU', W/2, H/2 + 82);
+    ctx.textAlign = 'left';
   }
 
   // ── Main loop ──────────────────────────────────────
   let lastTime = 0;
-  let _prevState = null;
   function loop(now) {
     lastTime = now;
-    if (state !== _prevState) {
-      _prevState = state;
-      window.TEP_onStateChange?.(state);
-    }
 
     // Only run game logic if level is loaded
     if (!level && state !== 'menu') { prevKeys = {...keys}; requestAnimationFrame(loop); return; }
