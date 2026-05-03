@@ -666,9 +666,8 @@
       touch-action: manipulation;
       border-radius: 0;
     }
-    @media (hover: none) and (pointer: coarse) {
-      #tc-pause { display: flex !important; }
-    }
+    /* Show pause button when game is active (controlled via JS) */
+    #tc-pause.visible { display: flex !important; }
 
     /* ── MOBILE OVERLAYS ─────────────────────────────── */
     #mobile-pause-overlay,
@@ -725,7 +724,6 @@
       #touch-controls { display: flex !important; }
     }
     #touch-controls { display: none; }
-
     /* ── SCANLINES ──────────────────────────────────── */
     #scanlines {
       position: fixed; inset: 0; z-index: 4; pointer-events: none;
@@ -878,6 +876,7 @@
   <div id="mobile-complete-overlay" aria-label="Level complete">
     <div class="mob-overlay-box">
       <div class="mob-overlay-title" style="color:#2ecc71">LEVEL CLEAR!</div>
+      <div id="mob-complete-stats" style="font-family:var(--px);font-size:8px;color:#cfe8ff;text-align:center;line-height:2;margin-bottom:4px"></div>
       <button class="mob-overlay-btn primary" id="mob-next">▶ NEXT LEVEL</button>
       <button class="mob-overlay-btn" id="mob-replay">↺ REPLAY</button>
       <button class="mob-overlay-btn danger" id="mob-complete-menu">⌂ MENU</button>
@@ -1426,7 +1425,7 @@ if (recBtn) {
   }, {passive:false});
 }
 
-/* ── Mobile overlay helpers ───────────────────────────── */
+/* ── Game state → overlay bridge ──────────────────────── */
 function hideMobileOverlays() {
   document.getElementById('mobile-pause-overlay')?.classList.remove('active');
   document.getElementById('mobile-complete-overlay')?.classList.remove('active');
@@ -1437,74 +1436,57 @@ function showMobileOverlay(id) {
   document.getElementById(id)?.classList.add('active');
 }
 
+const pauseBtn = document.getElementById('tc-pause');
+window.TEP_onStateChange = (gs) => {
+  hideMobileOverlays();
+  if (gs === 'play' || gs === 'endless') {
+    pauseBtn?.classList.add('visible');
+  } else {
+    pauseBtn?.classList.remove('visible');
+    if (gs === 'paused')   showMobileOverlay('mobile-pause-overlay');
+    if (gs === 'complete') showMobileOverlay('mobile-complete-overlay');
+    if (gs === 'dead')     setTimeout(() => { if (TEP.Game.getState() === 'dead') showMobileOverlay('mobile-dead-overlay'); }, 700);
+  }
+};
+
 // Pause button
-document.getElementById('tc-pause')?.addEventListener('click', () => {
+pauseBtn?.addEventListener('click', () => {
   const gs = TEP.Game.getState?.();
   if (gs === 'play' || gs === 'endless') {
     window.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape'}));
-    showMobileOverlay('mobile-pause-overlay');
-  } else if (gs === 'paused') {
-    window.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape'}));
-    hideMobileOverlays();
   }
 });
+pauseBtn?.addEventListener('touchstart', e => { e.preventDefault(); pauseBtn.click(); }, {passive:false});
 
 // Pause menu buttons
 document.getElementById('mob-resume')?.addEventListener('click', () => {
   window.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape'}));
-  hideMobileOverlays();
 });
 document.getElementById('mob-restart')?.addEventListener('click', () => {
   window.dispatchEvent(new KeyboardEvent('keydown', {key:'r'}));
-  hideMobileOverlays();
 });
 document.getElementById('mob-menu')?.addEventListener('click', () => {
   window.dispatchEvent(new KeyboardEvent('keydown', {key:'m'}));
-  hideMobileOverlays();
 });
 
 // Level complete overlay buttons
 document.getElementById('mob-next')?.addEventListener('click', () => {
   window.dispatchEvent(new KeyboardEvent('keydown', {key:'Enter'}));
-  hideMobileOverlays();
 });
 document.getElementById('mob-replay')?.addEventListener('click', () => {
   window.dispatchEvent(new KeyboardEvent('keydown', {key:'r'}));
-  hideMobileOverlays();
 });
 document.getElementById('mob-complete-menu')?.addEventListener('click', () => {
   window.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape'}));
-  hideMobileOverlays();
 });
 
 // Dead overlay buttons
 document.getElementById('mob-dead-restart')?.addEventListener('click', () => {
   window.dispatchEvent(new KeyboardEvent('keydown', {key:'r'}));
-  hideMobileOverlays();
 });
 document.getElementById('mob-dead-menu')?.addEventListener('click', () => {
   window.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape'}));
-  hideMobileOverlays();
 });
-
-// Auto-show/hide mobile overlays based on game state changes
-setInterval(() => {
-  const gs = TEP.Game?.getState?.();
-  const pauseEl = document.getElementById('mobile-pause-overlay');
-  const completeEl = document.getElementById('mobile-complete-overlay');
-  const deadEl = document.getElementById('mobile-dead-overlay');
-  if (!pauseEl) return;
-  // Only do something on mobile (coarse pointer)
-  if (!window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
-  if (gs === 'complete' && !completeEl.classList.contains('active') && !pauseEl.classList.contains('active')) {
-    showMobileOverlay('mobile-complete-overlay');
-  } else if (gs === 'dead' && !deadEl.classList.contains('active')) {
-    // wait a tick so death animation starts
-    setTimeout(() => { if (TEP.Game?.getState?.() === 'dead') showMobileOverlay('mobile-dead-overlay'); }, 700);
-  } else if ((gs === 'play' || gs === 'endless' || gs === 'menu') && (pauseEl.classList.contains('active') || completeEl.classList.contains('active') || deadEl.classList.contains('active'))) {
-    hideMobileOverlays();
-  }
-}, 120);
 
 /* ── Keyboard shortcuts ───────────────────────────────── */
 window.addEventListener('keydown', e => {
