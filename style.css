@@ -164,8 +164,8 @@ button { cursor: pointer; font-family: var(--font-pixel); }
   height: 45px;
   /* LIQUID GLASS */
   background: rgba(4,4,20,0.35);
-  backdrop-filter: var(--glas-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glas-blur-heavy);
+  -webkit-backdrop-filter: var(--glass-blur-heavy);
   border-bottom: 1px solid rgba(255,255,255,0.12);
   box-shadow:
     0 1px 0 rgba(255,255,255,0.08) inset,
