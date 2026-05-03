@@ -874,6 +874,7 @@ TEP.Game = (() => {
       case 'paused':
         if (pressed('escape')) state = 'play';
         if (pressed('r')) { deathHandled = false; deathCause = 'generic'; resetLevelState(); state = 'play'; }
+        if (pressed('m')) { deathHandled = false; deathCause = 'generic'; state = 'menu'; TEP.UI?.showMenu?.(); TEP.Sound?.stopBGM?.(); }
         R.drawWorld({ level, player, echoes, nightGlowRadius }, camX, camY, C.THEMES[level.theme] || C.THEMES.cave);
         drawNightGlow();
         drawPauseScreen();
