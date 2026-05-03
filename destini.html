@@ -652,6 +652,74 @@
       white-space: nowrap;
     }
 
+    /* ── MOBILE PAUSE BUTTON ─────────────────────────── */
+    #tc-pause {
+      display: none;
+      position: absolute; top: 10px; right: 10px;
+      width: 44px; height: 44px;
+      background: rgba(0,0,0,0.55);
+      border: 2px solid rgba(126,255,245,0.35);
+      color: #7efff5; font-size: 18px;
+      align-items: center; justify-content: center;
+      z-index: 60; cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      border-radius: 0;
+    }
+    @media (hover: none) and (pointer: coarse) {
+      #tc-pause { display: flex !important; }
+    }
+
+    /* ── MOBILE OVERLAYS ─────────────────────────────── */
+    #mobile-pause-overlay,
+    #mobile-complete-overlay,
+    #mobile-dead-overlay {
+      display: none;
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.78);
+      align-items: center; justify-content: center;
+      z-index: 55;
+    }
+    #mobile-pause-overlay.active,
+    #mobile-complete-overlay.active,
+    #mobile-dead-overlay.active {
+      display: flex;
+    }
+    .mob-overlay-box {
+      display: flex; flex-direction: column; align-items: center; gap: 14px;
+      padding: 28px 30px;
+      background: rgba(6,8,20,0.96);
+      border: 2px solid rgba(126,255,245,0.25);
+      min-width: 220px;
+    }
+    .mob-overlay-title {
+      font-family: var(--px); font-size: 14px; color: #7efff5;
+      letter-spacing: 2px; margin-bottom: 4px;
+    }
+    .mob-overlay-btn {
+      width: 100%; padding: 14px 10px;
+      font-family: var(--px); font-size: 9px; letter-spacing: 1px;
+      background: rgba(126,255,245,0.07);
+      border: 2px solid rgba(126,255,245,0.22);
+      color: #cfe8ff; cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: background 0.1s;
+    }
+    .mob-overlay-btn:active { background: rgba(126,255,245,0.2); }
+    .mob-overlay-btn.primary {
+      background: rgba(46,204,113,0.15);
+      border-color: rgba(46,204,113,0.45);
+      color: #2ecc71;
+    }
+    .mob-overlay-btn.primary:active { background: rgba(46,204,113,0.3); }
+    .mob-overlay-btn.danger {
+      background: rgba(255,60,60,0.08);
+      border-color: rgba(255,60,60,0.25);
+      color: #ff8888;
+    }
+    .mob-overlay-btn.danger:active { background: rgba(255,60,60,0.2); }
+
     /* ── TOUCH ──────────────────────────────────────── */
     @media (hover: none) and (pointer: coarse) {
       #touch-controls { display: flex !important; }
@@ -792,6 +860,38 @@
       <button class="touch-btn" id="tc-jump" type="button" aria-label="Jump">▲</button>
     </div>
   </aside>
+
+  <!-- Mobile pause button (top-right, visible during play) -->
+  <button id="tc-pause" type="button" aria-label="Pause game">⏸</button>
+
+  <!-- Mobile pause menu overlay -->
+  <div id="mobile-pause-overlay" aria-label="Pause menu">
+    <div class="mob-overlay-box">
+      <div class="mob-overlay-title">PAUSED</div>
+      <button class="mob-overlay-btn primary" id="mob-resume">▶ RESUME</button>
+      <button class="mob-overlay-btn" id="mob-restart">↺ RESTART</button>
+      <button class="mob-overlay-btn danger" id="mob-menu">⌂ MENU</button>
+    </div>
+  </div>
+
+  <!-- Mobile level complete overlay -->
+  <div id="mobile-complete-overlay" aria-label="Level complete">
+    <div class="mob-overlay-box">
+      <div class="mob-overlay-title" style="color:#2ecc71">LEVEL CLEAR!</div>
+      <button class="mob-overlay-btn primary" id="mob-next">▶ NEXT LEVEL</button>
+      <button class="mob-overlay-btn" id="mob-replay">↺ REPLAY</button>
+      <button class="mob-overlay-btn danger" id="mob-complete-menu">⌂ MENU</button>
+    </div>
+  </div>
+
+  <!-- Mobile dead overlay -->
+  <div id="mobile-dead-overlay" aria-label="You died">
+    <div class="mob-overlay-box">
+      <div class="mob-overlay-title" style="color:#cc0000">YOU DIED</div>
+      <button class="mob-overlay-btn primary" id="mob-dead-restart">↺ RESTART</button>
+      <button class="mob-overlay-btn danger" id="mob-dead-menu">⌂ MENU</button>
+    </div>
+  </div>
 </main>
 
 <!-- ══ PANELS CONTAINER — all panels center themselves ═ -->
@@ -1325,6 +1425,86 @@ if (recBtn) {
     setTimeout(()=>window.dispatchEvent(new KeyboardEvent('keyup',{key:'e'})),80);
   }, {passive:false});
 }
+
+/* ── Mobile overlay helpers ───────────────────────────── */
+function hideMobileOverlays() {
+  document.getElementById('mobile-pause-overlay')?.classList.remove('active');
+  document.getElementById('mobile-complete-overlay')?.classList.remove('active');
+  document.getElementById('mobile-dead-overlay')?.classList.remove('active');
+}
+function showMobileOverlay(id) {
+  hideMobileOverlays();
+  document.getElementById(id)?.classList.add('active');
+}
+
+// Pause button
+document.getElementById('tc-pause')?.addEventListener('click', () => {
+  const gs = TEP.Game.getState?.();
+  if (gs === 'play' || gs === 'endless') {
+    window.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape'}));
+    showMobileOverlay('mobile-pause-overlay');
+  } else if (gs === 'paused') {
+    window.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape'}));
+    hideMobileOverlays();
+  }
+});
+
+// Pause menu buttons
+document.getElementById('mob-resume')?.addEventListener('click', () => {
+  window.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape'}));
+  hideMobileOverlays();
+});
+document.getElementById('mob-restart')?.addEventListener('click', () => {
+  window.dispatchEvent(new KeyboardEvent('keydown', {key:'r'}));
+  hideMobileOverlays();
+});
+document.getElementById('mob-menu')?.addEventListener('click', () => {
+  window.dispatchEvent(new KeyboardEvent('keydown', {key:'m'}));
+  hideMobileOverlays();
+});
+
+// Level complete overlay buttons
+document.getElementById('mob-next')?.addEventListener('click', () => {
+  window.dispatchEvent(new KeyboardEvent('keydown', {key:'Enter'}));
+  hideMobileOverlays();
+});
+document.getElementById('mob-replay')?.addEventListener('click', () => {
+  window.dispatchEvent(new KeyboardEvent('keydown', {key:'r'}));
+  hideMobileOverlays();
+});
+document.getElementById('mob-complete-menu')?.addEventListener('click', () => {
+  window.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape'}));
+  hideMobileOverlays();
+});
+
+// Dead overlay buttons
+document.getElementById('mob-dead-restart')?.addEventListener('click', () => {
+  window.dispatchEvent(new KeyboardEvent('keydown', {key:'r'}));
+  hideMobileOverlays();
+});
+document.getElementById('mob-dead-menu')?.addEventListener('click', () => {
+  window.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape'}));
+  hideMobileOverlays();
+});
+
+// Auto-show/hide mobile overlays based on game state changes
+setInterval(() => {
+  const gs = TEP.Game?.getState?.();
+  const pauseEl = document.getElementById('mobile-pause-overlay');
+  const completeEl = document.getElementById('mobile-complete-overlay');
+  const deadEl = document.getElementById('mobile-dead-overlay');
+  if (!pauseEl) return;
+  // Only do something on mobile (coarse pointer)
+  if (!window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
+  if (gs === 'complete' && !completeEl.classList.contains('active') && !pauseEl.classList.contains('active')) {
+    showMobileOverlay('mobile-complete-overlay');
+  } else if (gs === 'dead' && !deadEl.classList.contains('active')) {
+    // wait a tick so death animation starts
+    setTimeout(() => { if (TEP.Game?.getState?.() === 'dead') showMobileOverlay('mobile-dead-overlay'); }, 700);
+  } else if ((gs === 'play' || gs === 'endless' || gs === 'menu') && (pauseEl.classList.contains('active') || completeEl.classList.contains('active') || deadEl.classList.contains('active'))) {
+    hideMobileOverlays();
+  }
+}, 120);
 
 /* ── Keyboard shortcuts ───────────────────────────────── */
 window.addEventListener('keydown', e => {
