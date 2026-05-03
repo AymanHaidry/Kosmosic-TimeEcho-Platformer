@@ -1001,18 +1001,35 @@ button { cursor: pointer; font-family: var(--font-pixel); }
   padding: 2px;
 }
 .lvl-btn {
+  width: 90px;
+  height: 90px;              /* 👈 equal = perfect circle */
+  border-radius: 50%;        /* 👈 makes it circular */
+
   background: rgba(255,255,255,0.05);
   backdrop-filter: blur(12px);
+
   border: 1px solid rgba(255,255,255,0.12);
   border-top-color: rgba(255,255,255,0.24);
-  color: #fff; font-family: var(--font-pixel);
+
+  color: #fff;
+  font-family: var(--font-pixel);
+  font-size: 7px;
+
+  display: flex;
+  align-items: center;       /* 👈 center content */
+  justify-content: center;
+
   padding: 0;
-  display: flex; flex-direction: column; align-items: stretch;
-  transition: all 0.14s; font-size: 7px;
-  cursor: pointer; overflow: hidden;
-  position: relative; min-height: 90px;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
 }
-.lvl-btn-stripe { height: 4px; width: 100%; display: block; }
+.lvl-btn-stripe {
+  height: 20px;
+  border-radius: 50% 50% 0 0;
+}
 .lvl-btn-body {
   display: flex; flex-direction: column; align-items: center;
   gap: 4px; padding: 8px 6px 10px; flex: 1;
