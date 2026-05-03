@@ -2,757 +2,64 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <meta name="theme-color" content="#08080f"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="theme-color" content="#04040e"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="apple-mobile-web-app-title" content="TimeEcho"/>
   <meta name="mobile-web-app-capable" content="yes"/>
-  <meta name="application-name" content="Time Echo"/>
 
   <title>Time Echo Platformer</title>
-  <meta name="description" content="Beat puzzles with your past self. A pixel-art time-echo platformer where you record echoes of yourself to solve puzzles."/>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2308080f'/%3E%3C!-- helmet --%3E%3Crect x='8' y='3' width='16' height='12' fill='%23005577'/%3E%3Crect x='9' y='2' width='14' height='5' fill='%23006699'/%3E%3C!-- visor --%3E%3Crect x='9' y='6' width='14' height='6' fill='%23001122'/%3E%3Crect x='10' y='7' width='12' height='4' fill='%2300d4ff' opacity='.8'/%3E%3Crect x='18' y='8' width='3' height='2' fill='%23fff'/%3E%3C!-- body --%3E%3Crect x='9' y='14' width='14' height='12' fill='%23004466'/%3E%3Crect x='12' y='15' width='8' height='8' fill='%2300d4ff'/%3E%3Crect x='14' y='17' width='4' height='4' fill='%23fff'/%3E%3Crect x='15' y='18' width='2' height='2' fill='%2300d4ff'/%3E%3C!-- legs --%3E%3Crect x='9' y='25' width='6' height='6' fill='%23004466'/%3E%3Crect x='17' y='25' width='6' height='6' fill='%23004466'/%3E%3C!-- arms --%3E%3Crect x='4' y='15' width='5' height='9' fill='%23003355'/%3E%3Crect x='23' y='15' width='5' height='9' fill='%23003355'/%3E%3C/svg%3E"/>
+  <meta name="description" content="Beat puzzles with your past self. A pixel-art time-echo platformer."/>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2304040e'/%3E%3Crect x='8' y='3' width='16' height='12' fill='%23005577'/%3E%3Crect x='9' y='2' width='14' height='5' fill='%23006699'/%3E%3Crect x='9' y='6' width='14' height='6' fill='%23001122'/%3E%3Crect x='10' y='7' width='12' height='4' fill='%2300d4ff' opacity='.8'/%3E%3Crect x='18' y='8' width='3' height='2' fill='%23fff'/%3E%3Crect x='9' y='14' width='14' height='12' fill='%23004466'/%3E%3Crect x='12' y='15' width='8' height='8' fill='%2300d4ff'/%3E%3Crect x='14' y='17' width='4' height='4' fill='%23fff'/%3E%3Crect x='15' y='18' width='2' height='2' fill='%2300d4ff'/%3E%3Crect x='9' y='25' width='6' height='6' fill='%23004466'/%3E%3Crect x='17' y='25' width='6' height='6' fill='%23004466'/%3E%3Crect x='4' y='15' width='5' height='9' fill='%23003355'/%3E%3Crect x='23' y='15' width='5' height='9' fill='%23003355'/%3E%3C/svg%3E"/>
   <link rel="manifest" href="/manifest.json"/>
   <link rel="stylesheet" href="/style.css"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Rajdhani:wght@400;600;700&display=swap"/>
 
   <script>
-    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    window.va = window.va || function() { (window.vaq = window.vaq || []).push(arguments); };
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
 
   <style>
-    /* ── PIXEL CURSOR — applied universally ─────────────
-       Single SVG cursor: 16×16 cyan crosshair pixel block.
-       Applied to * so it covers every element including
-       buttons, inputs, selects, and the canvas.            */
+    /* ── PIXEL CURSOR ─── */
     :root {
       --cursor-default: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Crect x='8' y='0' width='4' height='4' fill='%2300d4ff'/%3E%3Crect x='8' y='16' width='4' height='4' fill='%2300d4ff'/%3E%3Crect x='0' y='8' width='4' height='4' fill='%2300d4ff'/%3E%3Crect x='16' y='8' width='4' height='4' fill='%2300d4ff'/%3E%3Crect x='7' y='7' width='6' height='6' fill='%2300d4ff' opacity='.5'/%3E%3C/svg%3E") 10 10, crosshair;
       --cursor-pointer: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Crect x='4' y='0' width='4' height='12' fill='%23ffd700'/%3E%3Crect x='4' y='0' width='12' height='4' fill='%23ffd700'/%3E%3Crect x='8' y='4' width='4' height='4' fill='%23ffd700'/%3E%3Crect x='4' y='12' width='4' height='8' fill='%23ffd700'/%3E%3C/svg%3E") 4 0, pointer;
+      --px: 'Press Start 2P', monospace;
+      --cyan: #00d4ff;
+      --gold: #ffd700;
     }
 
     *, *::before, *::after {
       box-sizing: border-box; margin: 0; padding: 0;
       cursor: var(--cursor-default) !important;
     }
-
-    /* Interactive elements get the gold pointer cursor */
     a, button, select, input[type="submit"], input[type="button"],
     input[type="checkbox"], input[type="radio"], label,
     [role="button"], [tabindex], .mc-btn, .close-btn, .nav-btn,
     .auth-tab, .top-btn, .touch-btn, .submit-btn, .shop-item,
-    .level-btn, .lb-filters select, .lb-filters button {
+    .level-btn, .lb-filters select, .lb-filters button, .lvl-btn, .mob-overlay-btn {
       cursor: var(--cursor-pointer) !important;
     }
-
-    /* Text inputs keep default (crosshair looks off in text fields) */
     input[type="text"], input[type="email"], input[type="password"],
     input[type="search"], textarea {
       cursor: var(--cursor-default) !important;
-    }
-
-    :root {
-      --px: 'Press Start 2P', monospace;
-      --dirt-dark:  #3d2b1a;
-      --dirt-mid:   #5a3d22;
-      --dirt-light: #7a5530;
-      --stone-dark: #2a2a2a;
-      --stone-mid:  #3c3c3c;
-      --stone-light:#4e4e4e;
-      --cyan:       #00d4ff;
-      --cyan-glow:  rgba(0,212,255,0.35);
-      --gold:       #ffd700;
-      --red:        #ff4455;
-      --green:      #44cc22;
-      --ui-bg:      rgba(8,8,15,0.92);
-      --border:     #00d4ff44;
-    }
-
-    html, body {
-      width: 100%; height: 100%; overflow: hidden;
-      background: #000;
-      font-family: var(--px);
-    }
-
-    /* ── PANORAMA BACKGROUND ─────────────────────────── */
-    #panorama-canvas {
-      position: fixed; inset: 0;
-      width: 100%; height: 100%;
-      z-index: 0;
-    }
-
-    /* ── DIRT TEXTURE OVERLAY ────────────────────────── */
-    #dirt-overlay {
-      position: fixed; inset: 0;
-      z-index: 1;
-      pointer-events: none;
-      background-image:
-        repeating-linear-gradient(0deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 2px, transparent 2px, transparent 8px),
-        repeating-linear-gradient(90deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 8px);
-      background-size: 8px 8px;
-    }
-
-    /* ── VIGNETTE ────────────────────────────────────── */
-    /* removed*/
-    /* #vignette {
-      position: fixed; inset: 0; z-index: 2; pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.75) 100%);
-    } */
-
-    /* ── MAIN LAYOUT ────────────────────────────────── */
-    #app {
-      position: relative; z-index: 10;
-      width: 100%; height: 100vh;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 0;
-    }
-
-    /* ── TITLE BLOCK ─────────────────────────────────── */
-    #title-block {
-      text-align: center;
-      margin-bottom: 28px;
-      animation: titleDrop 0.6s cubic-bezier(.22,1,.36,1) both;
-    }
-    @keyframes titleDrop {
-      from { opacity:0; transform:translateY(-40px) scale(0.9); }
-      to   { opacity:1; transform:translateY(0) scale(1); }
-    }
-
-    #game-title {
-      font-family: var(--px);
-      font-size: clamp(22px, 4vw, 42px);
-      letter-spacing: 4px;
-      line-height: 1.2;
-      color: #ffffff;
-      text-shadow:
-        3px 3px 0 #3a3a00,
-        -1px -1px 0 #555500,
-        0 0 30px rgba(255,220,0,0.4),
-        0 0 60px rgba(255,220,0,0.15);
-      image-rendering: pixelated;
-      user-select: none;
-    }
-    #game-title span {
-      color: #00d4ff;
-      text-shadow:
-        3px 3px 0 #003355,
-        0 0 30px rgba(0,212,255,0.6),
-        0 0 70px rgba(0,212,255,0.2);
-    }
-
-    #game-subtitle {
-      font-family: var(--px);
-      font-size: clamp(6px, 1.1vw, 10px);
-      color: #aaa;
-      margin-top: 10px;
-      letter-spacing: 2px;
-      text-shadow: 1px 1px 0 #000;
-      animation: pulse 3s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%,100% { opacity: 0.6; } 50% { opacity: 1; }
-    }
-
-    /* ── MENU CONTAINER ─────────────────────────────── */
-    #menu-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      animation: menuRise 0.7s 0.15s cubic-bezier(.22,1,.36,1) both;
-      width: min(380px, 90vw);
-    }
-    @keyframes menuRise {
-      from { opacity:0; transform:translateY(30px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-
-    /* ── MINECRAFT-STYLE BUTTON ──────────────────────── */
-    .mc-btn {
-      width: 100%;
-      padding: 11px 20px;
-      font-family: var(--px);
-      font-size: clamp(7px, 1.3vw, 11px);
-      letter-spacing: 1px;
-      text-align: center;
-      color: #fff;
-      border: none;
-      outline: none;
-      position: relative;
-      user-select: none;
-      transition: filter 0.05s, transform 0.05s;
-
-      background: linear-gradient(180deg, #5a5a5a 0%, #3c3c3c 45%, #2e2e2e 46%, #3a3a3a 100%);
-      border-top:    3px solid #8a8a8a;
-      border-left:   3px solid #7a7a7a;
-      border-right:  3px solid #1a1a1a;
-      border-bottom: 3px solid #111;
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.08),
-        0 4px 0 #111,
-        0 5px 8px rgba(0,0,0,0.5);
-      text-shadow: 2px 2px 0 #000, 0 0 8px rgba(0,212,255,0.3);
-      image-rendering: pixelated;
-    }
-    .mc-btn:hover {
-      background: linear-gradient(180deg, #7a9aff 0%, #4a6aee 45%, #3a5add 46%, #4a6aff 100%);
-      border-top-color:    #aabbff;
-      border-left-color:   #99aaff;
-      border-right-color:  #1a2280;
-      border-bottom-color: #111833;
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.15),
-        0 4px 0 #111,
-        0 5px 16px rgba(80,120,255,0.4),
-        0 0 30px rgba(0,212,255,0.15);
-      text-shadow: 2px 2px 0 #000, 0 0 12px rgba(0,212,255,0.8);
-      filter: brightness(1.08);
-    }
-    .mc-btn:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 #111, 0 2px 4px rgba(0,0,0,0.5);
-      border-top-color:    #5a5a5a;
-      border-bottom-color: #3a3aaa;
-    }
-
-    .mc-btn.primary {
-      background: linear-gradient(180deg, #006688 0%, #004466 45%, #003355 46%, #004060 100%);
-      border-top-color:    #00aadd;
-      border-left-color:   #0088bb;
-      border-right-color:  #001a33;
-      border-bottom-color: #001122;
-      box-shadow:
-        inset 0 1px 0 rgba(0,212,255,0.15),
-        0 4px 0 #001122,
-        0 5px 20px rgba(0,212,255,0.25),
-        0 0 40px rgba(0,212,255,0.08);
-      color: #00d4ff;
-      text-shadow: 2px 2px 0 #000, 0 0 12px rgba(0,212,255,0.6);
-    }
-    .mc-btn.primary:hover {
-      background: linear-gradient(180deg, #0099cc 0%, #007799 45%, #006688 46%, #0088aa 100%);
-      border-top-color: #55eeff;
-      border-left-color: #33ccee;
-      box-shadow:
-        inset 0 1px 0 rgba(0,255,255,0.2),
-        0 4px 0 #001122,
-        0 5px 28px rgba(0,212,255,0.55),
-        0 0 60px rgba(0,212,255,0.2);
-      color: #fff;
-    }
-
-    .mc-btn.danger {
-      background: linear-gradient(180deg, #661122 0%, #440d1a 45%, #330c14 46%, #3d0f18 100%);
-      border-top-color:    #cc2244;
-      border-left-color:   #aa1a33;
-      border-right-color:  #220611;
-      border-bottom-color: #110309;
-      color: #ff7799;
-      text-shadow: 2px 2px 0 #000, 0 0 8px rgba(255,40,80,0.4);
-    }
-
-    .mc-btn-row {
-      display: flex; gap: 6px; width: 100%;
-    }
-    .mc-btn-row .mc-btn { flex: 1; font-size: clamp(6px, 1vw, 9px); }
-
-    .mc-divider {
-      width: 100%; height: 3px; margin: 6px 0;
-      background: linear-gradient(90deg, transparent, #444, #666, #444, transparent);
-      position: relative;
-    }
-    .mc-divider::after {
-      content: '';
-      position: absolute; inset: 1px;
-      background: linear-gradient(90deg, transparent, #222, #333, #222, transparent);
-    }
-
-    /* ── VERSION TAG ────────────────────────────────── */
-    #version-tag {
-      position: fixed; bottom: 10px; left: 12px;
-      font-family: var(--px); font-size: 7px;
-      color: #555; text-shadow: 1px 1px 0 #000;
-      z-index: 20; pointer-events: none;
-    }
-    #copyright-tag {
-      position: fixed; bottom: 10px; right: 12px;
-      font-family: var(--px); font-size: 7px;
-      color: #444; text-shadow: 1px 1px 0 #000;
-      z-index: 20; pointer-events: none;
-    }
-
-    /* ── PIXEL PARTICLES ────────────────────────────── */
-    #particles { position:fixed; inset:0; z-index:3; pointer-events:none; }
-
-    /* ── SPLASH TEXT ────────────────────────────────── */
-    #splash {
-      position: fixed; top: 22%; left: 65%;
-      transform: translateX(-40%) rotate(-15deg);
-      font-family: var(--px);
-      font-size: clamp(7px, 1.3vw, 11px);
-      color: #ffd700;
-      text-shadow: 2px 2px 0 #664400, 0 0 20px rgba(255,200,0,0.6);
-      animation: splashPop 0.8s ease-out both, splashBob 2s 0.8s ease-in-out infinite;
-      z-index: 15;
-      white-space: nowrap;
-      pointer-events: none;
-    }
-    @keyframes splashPop {
-      from { transform: translateX(-40%) rotate(-15deg) scale(0); opacity:0; }
-      60%  { transform: translateX(-40%) rotate(-15deg) scale(1.2); }
-      to   { transform: translateX(-40%) rotate(-15deg) scale(1); opacity:1; }
-    }
-    @keyframes splashBob {
-      0%,100% { transform: translateX(-40%) rotate(-15deg) scale(1); }
-      50%     { transform: translateX(-40%) rotate(-15deg) scale(1.06); }
-    }
-
-    /* ── STATS BAR ──────────────────────────────────── */
-    #stats-bar {
-      margin-top: 14px;
-      display: flex; gap: 18px;
-      font-family: var(--px); font-size: 7px;
-      color: #666;
-      animation: menuRise 0.8s 0.3s both;
-    }
-    #stats-bar span { text-shadow: 1px 1px 0 #000; }
-
-    /* ── NAV (top bar) ──────────────────────────────── */
-    #top-bar {
-      position: fixed; top: 0; left: 0; right: 0;
-      z-index: 20;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 8px 16px;
-      background: rgba(0,0,0,0.55);
-      border-bottom: 2px solid rgba(0,212,255,0.12);
-      backdrop-filter: blur(4px);
-    }
-    #top-bar .logo {
-      font-family: var(--px); font-size: 9px;
-      color: #00d4ff; text-shadow: 1px 1px 0 #003344, 0 0 10px rgba(0,212,255,0.5);
-    }
-    #top-bar-right {
-      display: flex; align-items: center; gap: 10px;
-    }
-    .top-btn {
-      font-family: var(--px); font-size: 7px;
-      color: #aaa; background: transparent; border: none;
-      padding: 4px 8px;
-      transition: color 0.1s;
-    }
-    .top-btn:hover { color: #00d4ff; }
-
-    /* ── PANELS — centered overlay system ───────────── */
-    /* The panels-container fills the viewport and centers
-       each panel both horizontally and vertically.        */
-    #panels-container {
-      position: fixed; inset: 0;
-      z-index: 500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none; /* pass through when no panel is visible */
-    }
-
-    .tep-panel {
-      display: none;
-      position: absolute; inset: 0;
-      /* Each panel is itself a flex centering container */
-      align-items: center;
-      justify-content: center;
-      /* Dim backdrop */
-      background: rgba(0, 0, 0, 0.72);
-      backdrop-filter: blur(3px);
-      pointer-events: all;
-      overflow-y: auto;
-      padding: 60px 16px 24px; /* room for top-bar */
-    }
-
-    /* When a panel is visible */
-    .tep-panel:not(.hidden) {
-      display: flex;
-    }
-
-    /* ── PANEL BOX — the actual content card ─────────── */
-    .panel-box {
-      position: relative;
-      width: 100%;
-      max-width: 680px;         /* overridden inline per-panel */
-      max-height: calc(100vh - 100px);
-      overflow-y: auto;
-      padding: 32px 28px 28px;
-
-      background:
-        linear-gradient(180deg, rgba(14,14,28,0.98) 0%, rgba(8,8,18,0.99) 100%);
-      border: 2px solid rgba(0,212,255,0.22);
-      border-top-color: rgba(0,212,255,0.45);
-      border-left-color: rgba(0,212,255,0.30);
-      box-shadow:
-        0 0 0 1px rgba(0,0,0,0.8),
-        0 8px 40px rgba(0,0,0,0.7),
-        0 0 60px rgba(0,212,255,0.06),
-        inset 0 1px 0 rgba(255,255,255,0.04);
-
-      font-family: var(--px);
-      animation: panelAppear 0.18s cubic-bezier(.22,1,.36,1) both;
-    }
-
-    @keyframes panelAppear {
-      from { opacity: 0; transform: scale(0.95) translateY(12px); }
-      to   { opacity: 1; transform: scale(1)    translateY(0); }
-    }
-
-    /* Scrollbar styling inside panels */
-    .panel-box::-webkit-scrollbar { width: 6px; }
-    .panel-box::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
-    .panel-box::-webkit-scrollbar-thumb {
-      background: rgba(0,212,255,0.3);
-      border-radius: 0;
-    }
-    .panel-box::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.5); }
-
-    /* ── PANEL TYPOGRAPHY ────────────────────────────── */
-    .panel-box h2 {
-      font-family: var(--px);
-      font-size: clamp(10px, 2vw, 16px);
-      color: #00d4ff;
-      text-shadow: 2px 2px 0 #003355, 0 0 20px rgba(0,212,255,0.4);
-      margin-bottom: 20px;
-      letter-spacing: 3px;
-      text-align: center;
-      padding-bottom: 12px;
-      border-bottom: 2px solid rgba(0,212,255,0.15);
-    }
-
-    .hero-title {
-      font-family: var(--px);
-      font-size: clamp(12px, 2.5vw, 20px);
-      color: #00d4ff;
-      text-shadow: 2px 2px 0 #003355, 0 0 20px rgba(0,212,255,0.4);
-      margin-bottom: 6px;
-      letter-spacing: 3px;
-      text-align: center;
-    }
-
-    .section-title {
-      font-family: var(--px);
-      font-size: 8px;
-      color: #556;
-      text-align: center;
-      margin-bottom: 18px;
-      letter-spacing: 2px;
-    }
-
-    /* ── CLOSE BUTTON ────────────────────────────────── */
-    .close-btn {
-      position: absolute; top: 10px; right: 12px;
-      font-family: var(--px); font-size: 12px;
-      color: #556; background: transparent; border: none;
-      padding: 4px 8px;
-      transition: color 0.1s, text-shadow 0.1s;
-      line-height: 1;
-    }
-    .close-btn:hover {
-      color: #ff4455;
-      text-shadow: 0 0 10px rgba(255,68,85,0.6);
-    }
-
-    /* ── NAV BUTTON (Back links inside panels) ───────── */
-    .nav-btn {
-      font-family: var(--px); font-size: 7px;
-      color: #7efff5; background: transparent; border: none;
-      padding: 6px 10px;
-      transition: color 0.1s;
-    }
-    .nav-btn:hover { color: #00d4ff; }
-
-    /* ── AUTH PANEL ──────────────────────────────────── */
-    .auth-tabs {
-      display: flex; gap: 0;
-      margin-bottom: 20px;
-      border-bottom: 2px solid rgba(0,212,255,0.15);
-    }
-    .auth-tab {
-      flex: 1;
-      font-family: var(--px); font-size: 8px;
-      padding: 8px; text-align: center;
-      background: transparent; border: none;
-      color: #556;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -2px;
-      transition: color 0.1s, border-color 0.1s;
-    }
-    .auth-tab.active {
-      color: #00d4ff;
-      border-bottom-color: #00d4ff;
-    }
-    .auth-tab:hover { color: #7efff5; }
-
-    .field-row {
-      display: flex; flex-direction: column; gap: 6px;
-      margin-bottom: 14px;
-    }
-    .field-row label {
-      font-family: var(--px); font-size: 7px;
-      color: #778; letter-spacing: 1px;
-    }
-    .field-row input {
-      font-family: var(--px); font-size: 8px;
-      padding: 9px 10px;
-      background: rgba(0,0,0,0.5);
-      border: 2px solid rgba(0,212,255,0.18);
-      border-top-color: rgba(0,0,0,0.5);
-      border-left-color: rgba(0,0,0,0.4);
-      color: #cfe8ff;
-      outline: none;
-      width: 100%;
-      transition: border-color 0.15s;
-    }
-    .field-row input:focus {
-      border-color: rgba(0,212,255,0.50);
-      background: rgba(0,20,40,0.7);
-    }
-
-    .submit-btn {
-      width: 100%; margin-top: 6px;
-      font-family: var(--px); font-size: 9px;
-      padding: 10px;
-      background: linear-gradient(180deg, #006688 0%, #004466 45%, #003355 46%, #004060 100%);
-      border-top:    2px solid #00aadd;
-      border-left:   2px solid #0088bb;
-      border-right:  2px solid #001a33;
-      border-bottom: 2px solid #001122;
-      color: #00d4ff;
-      text-shadow: 1px 1px 0 #000;
-      letter-spacing: 1px;
-      transition: filter 0.1s, transform 0.05s;
-    }
-    .submit-btn:hover {
-      filter: brightness(1.25);
-      color: #fff;
-    }
-    .submit-btn:active { transform: translateY(2px); }
-
-    #auth-err {
-      font-family: var(--px); font-size: 7px;
-      color: #ff4455; min-height: 18px;
-      margin-top: 8px; text-align: center;
-    }
-    .auth-guest-note {
-      font-family: var(--px); font-size: 6px;
-      color: #445; margin-top: 14px; text-align: center; line-height: 2;
-    }
-    .auth-guest-note a { color: #00d4ff; text-decoration: underline; }
-
-    /* ── SHOP PANEL ──────────────────────────────────── */
-    .shop-coins-bar {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 16px;
-      font-family: var(--px); font-size: 9px; color: #ffd700;
-    }
-    .shop-section-title {
-      font-family: var(--px); font-size: 8px; color: #556;
-      letter-spacing: 2px; margin: 16px 0 10px;
-      border-bottom: 1px solid rgba(0,212,255,0.10);
-      padding-bottom: 6px;
-    }
-    .shop-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 10px;
-    }
-
-    /* ── LEADERBOARD PANEL ───────────────────────────── */
-    .lb-filters {
-      display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
-      margin-bottom: 16px;
-      font-family: var(--px); font-size: 7px; color: #778;
-    }
-    .lb-filters select {
-      font-family: var(--px); font-size: 7px;
-      background: rgba(0,0,0,0.6);
-      border: 1px solid rgba(0,212,255,0.2);
-      color: #cfe8ff; padding: 4px 6px;
-    }
-    .lb-table {
-      width: 100%; border-collapse: collapse;
-      font-family: var(--px); font-size: 7px;
-    }
-    .lb-table th {
-      color: #556; padding: 6px 8px; text-align: left;
-      border-bottom: 1px solid rgba(0,212,255,0.12);
-    }
-    .lb-table td {
-      color: #aac; padding: 7px 8px;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-    }
-    .lb-table tr:hover td { background: rgba(0,212,255,0.04); color: #cfe8ff; }
-
-    /* ── CONTROLS GRID (Help panel) ──────────────────── */
-    .controls-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-    }
-    .ctrl-row {
-      display: flex; align-items: center; gap: 10px;
-      padding: 5px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      font-family: var(--px); font-size: 7px;
-    }
-    .ctrl-key {
-      font-family: var(--px); font-size: 6px;
-      color: #ffd700; white-space: nowrap;
-      background: rgba(0,0,0,0.4);
-      border: 1px solid rgba(255,215,0,0.25);
-      padding: 3px 5px; min-width: 60px; text-align: center;
-    }
-    .ctrl-desc { color: #889; font-size: 7px; }
-
-    /* ── LEVEL GRID ──────────────────────────────────── */
-    #level-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    /* ── PWA BANNER ─────────────────────────────────── */
-    #pwa-banner {
-      display: none;
-      position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
-      background: rgba(8,8,15,0.96);
-      border: 3px solid #00d4ff44;
-      border-top-color: #00d4ff88;
-      border-left-color: #00d4ff66;
-      color: #cfe8ff;
-      font-family: var(--px); font-size: 7px;
-      padding: 14px 20px; gap: 10px;
-      align-items: center; z-index: 9001;
-      box-shadow: 0 0 40px rgba(0,212,255,0.15);
-      max-width: 340px; text-align: center;
-    }
-    #pwa-banner.show { display: flex; flex-direction: column; }
-    #pwa-banner-btns { display: flex; gap: 10px; margin-top: 10px; }
-
-    /* ── TOAST ──────────────────────────────────────── */
-    #toast {
-      position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-20px);
-      font-family: var(--px); font-size: 8px;
-      padding: 10px 18px;
-      border: 2px solid rgba(0,0,0,0.4);
-      border-top-color: rgba(255,255,255,0.3);
-      border-left-color: rgba(255,255,255,0.2);
-      box-shadow: 0 4px 0 rgba(0,0,0,0.5), 0 8px 20px rgba(0,0,0,0.4);
-      opacity: 0; z-index: 9999;
-      transition: opacity 0.25s, transform 0.25s;
-      pointer-events: none;
-      white-space: nowrap;
-    }
-
-    /* ── MOBILE PAUSE BUTTON ─────────────────────────── */
-    #tc-pause {
-      display: none;
-      position: absolute; top: 10px; right: 10px;
-      width: 44px; height: 44px;
-      background: rgba(0,0,0,0.55);
-      border: 2px solid rgba(126,255,245,0.35);
-      color: #7efff5; font-size: 18px;
-      align-items: center; justify-content: center;
-      z-index: 60; cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-      border-radius: 0;
-    }
-    @media (hover: none) and (pointer: coarse) {
-      #tc-pause { display: flex !important; }
-    }
-
-    /* ── MOBILE OVERLAYS ─────────────────────────────── */
-    #mobile-pause-overlay,
-    #mobile-complete-overlay,
-    #mobile-dead-overlay {
-      display: none;
-      position: absolute; inset: 0;
-      background: rgba(0,0,0,0.78);
-      align-items: center; justify-content: center;
-      z-index: 55;
-    }
-    #mobile-pause-overlay.active,
-    #mobile-complete-overlay.active,
-    #mobile-dead-overlay.active {
-      display: flex;
-    }
-    .mob-overlay-box {
-      display: flex; flex-direction: column; align-items: center; gap: 14px;
-      padding: 28px 30px;
-      background: rgba(6,8,20,0.96);
-      border: 2px solid rgba(126,255,245,0.25);
-      min-width: 220px;
-    }
-    .mob-overlay-title {
-      font-family: var(--px); font-size: 14px; color: #7efff5;
-      letter-spacing: 2px; margin-bottom: 4px;
-    }
-    .mob-overlay-btn {
-      width: 100%; padding: 14px 10px;
-      font-family: var(--px); font-size: 9px; letter-spacing: 1px;
-      background: rgba(126,255,245,0.07);
-      border: 2px solid rgba(126,255,245,0.22);
-      color: #cfe8ff; cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-      transition: background 0.1s;
-    }
-    .mob-overlay-btn:active { background: rgba(126,255,245,0.2); }
-    .mob-overlay-btn.primary {
-      background: rgba(46,204,113,0.15);
-      border-color: rgba(46,204,113,0.45);
-      color: #2ecc71;
-    }
-    .mob-overlay-btn.primary:active { background: rgba(46,204,113,0.3); }
-    .mob-overlay-btn.danger {
-      background: rgba(255,60,60,0.08);
-      border-color: rgba(255,60,60,0.25);
-      color: #ff8888;
-    }
-    .mob-overlay-btn.danger:active { background: rgba(255,60,60,0.2); }
-
-    /* ── TOUCH ──────────────────────────────────────── */
-    @media (hover: none) and (pointer: coarse) {
-      #touch-controls { display: flex !important; }
-    }
-    #touch-controls { display: none; }
-
-    /* ── SCANLINES ──────────────────────────────────── */
-    #scanlines {
-      position: fixed; inset: 0; z-index: 4; pointer-events: none;
-      background: repeating-linear-gradient(
-        0deg,
-        rgba(0,0,0,0) 0px, rgba(0,0,0,0) 3px,
-        rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px
-      );
-    }
-
-    /* ── RESPONSIVE ─────────────────────────────────── */
-    @media (max-width: 500px) {
-      #splash { display: none; }
-      #game-title { font-size: 18px; }
-      #menu-container { width: 94vw; }
-      .panel-box { padding: 24px 14px 20px; }
-      .controls-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-<!-- Panorama canvas -->
-<canvas id="panorama-canvas"></canvas>
+<!-- ════════════════════════════════════════════════
+     GLOBAL PARALLAX SCENE — always visible, even behind game
+     ════════════════════════════════════════════════ -->
+<div id="scene-bg">
+  <canvas id="panorama-canvas"></canvas>
+</div>
 
 <!-- Overlays -->
-<div id="dirt-overlay"></div>
 <div id="scanlines"></div>
 <div id="vignette"></div>
 <canvas id="particles"></canvas>
@@ -760,34 +67,37 @@
 <!-- Splash text -->
 <div id="splash">Now with Echoes!</div>
 
-<!-- Top bar -->
+<!-- ════════════════════════════════════════════════
+     TOP BAR — unified PC + mobile
+     ════════════════════════════════════════════════ -->
 <div id="top-bar">
-  <div class="logo">TIME<span style="color:#fff;opacity:0.6">·</span>ECHO</div>
+  <div class="logo">TIME<span style="opacity:0.5">·</span>ECHO</div>
   <div id="top-bar-right">
     <div id="nav-guest" style="display:flex;gap:6px;">
       <button class="top-btn" onclick="TEP.UI.showAuth('login')">LOGIN</button>
       <button class="top-btn" onclick="TEP.UI.showAuth('register')">REGISTER</button>
     </div>
-    <div id="nav-user" class="hidden" style="display:flex;align-items:center;gap:10px;">
+    <div id="nav-user" class="hidden" style="display:flex;align-items:center;gap:8px;">
       <span id="nav-username" style="font-family:var(--px);font-size:7px;color:#00d4ff;"></span>
-      <span id="nav-coins" style="font-family:var(--px);font-size:7px;color:#ffd700;"></span>
+      <span id="nav-coins"    style="font-family:var(--px);font-size:7px;color:#ffd700;"></span>
       <button class="top-btn" id="logout-btn">LOGOUT</button>
     </div>
   </div>
 </div>
 
-<!-- Main app -->
+<!-- ════════════════════════════════════════════════
+     MAIN LAUNCHPAD
+     ════════════════════════════════════════════════ -->
 <div id="app">
 
-  <!-- Title -->
   <div id="title-block">
     <div id="game-title">TIME <span>ECHO</span></div>
     <div id="game-subtitle">Beat puzzles with your past self.</div>
   </div>
 
-  <!-- Menu buttons -->
   <div id="menu-container">
-    <button class="mc-btn primary" onclick="TEP.UI._scrollToLevels ? (TEP.UI.showMenu(), setTimeout(TEP.UI._scrollToLevels,100)) : TEP.UI.showMenu()">
+    <button class="mc-btn primary"
+      onclick="TEP.UI._scrollToLevels ? (TEP.UI.showMenu(), setTimeout(TEP.UI._scrollToLevels,100)) : TEP.UI.showMenu()">
       ▶ &nbsp; SINGLEPLAYER
     </button>
 
@@ -814,12 +124,12 @@
 
     <div class="mc-divider"></div>
 
-    <button class="mc-btn danger" id="quit-btn" onclick="showToastLocal('You\'re already here. There\'s no escape.', '#ff4455')">
+    <button class="mc-btn danger" id="quit-btn"
+      onclick="showToastLocal('You\'re already here. There\'s no escape.', '#ff4455')">
       ✕ &nbsp; QUIT TO REALITY
     </button>
   </div>
 
-  <!-- Stats -->
   <div id="stats-bar">
     <span id="stat-level">LVL —</span>
     <span id="stat-coins">🪙 —</span>
@@ -837,80 +147,86 @@
   <div>📲 INSTALL TIME ECHO</div>
   <div style="color:#556;font-size:6px;margin-top:4px">Play offline · Full screen · No browser UI</div>
   <div id="pwa-banner-btns">
-    <button id="pwa-install-btn" class="mc-btn" style="font-size:7px;padding:6px 14px;width:auto;">INSTALL</button>
-    <button id="pwa-dismiss-btn" class="mc-btn" style="font-size:7px;padding:6px 14px;width:auto;color:#666;">LATER</button>
+    <button id="pwa-install-btn" class="mc-btn" style="font-size:7px;padding:7px 14px;width:auto;">INSTALL</button>
+    <button id="pwa-dismiss-btn" class="mc-btn" style="font-size:7px;padding:7px 14px;width:auto;color:#666;">LATER</button>
   </div>
 </div>
 
 <!-- Toast -->
 <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
-<!-- ══ GAME CANVAS ════════════════════════════════════ -->
-<main id="main-game" style="display:none;position:fixed;inset:0;z-index:100;background:#000;">
-  <div id="canvas-wrap" role="img" aria-label="Game canvas">
-    <canvas id="game-canvas" width="1350" height="480" title="Time Echo Game Canvas"></canvas>
+<!-- ════════════════════════════════════════════════
+     GAME CANVAS — transparent bg so parallax shows
+     ════════════════════════════════════════════════ -->
+<main id="main-game" style="display:none;position:fixed;inset:0;z-index:100;background:transparent;">
+  <div id="canvas-wrap" role="img" aria-label="Game canvas"
+       style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;">
+    <canvas id="game-canvas" width="1350" height="480" title="Time Echo Game Canvas"
+            style="display:block;max-width:100%;max-height:100%;image-rendering:pixelated;"></canvas>
   </div>
+
   <aside id="touch-controls" aria-label="Mobile game controls">
     <div class="touch-dpad">
-      <button class="touch-btn" id="tc-left" type="button" aria-label="Move left">◀</button>
+      <button class="touch-btn" id="tc-left"  type="button" aria-label="Move left">◀</button>
       <button class="touch-btn" id="tc-right" type="button" aria-label="Move right">▶</button>
     </div>
     <div class="touch-actions">
       <button class="touch-btn rec-btn" id="tc-record" type="button" aria-label="Record echo">●REC</button>
-      <button class="touch-btn" id="tc-jump" type="button" aria-label="Jump">▲</button>
+      <button class="touch-btn"         id="tc-jump"   type="button" aria-label="Jump">▲</button>
     </div>
   </aside>
 
-  <!-- Mobile pause button (top-right, visible during play) -->
   <button id="tc-pause" type="button" aria-label="Pause game">⏸</button>
 
-  <!-- Mobile pause menu overlay -->
+  <!-- Mobile pause -->
   <div id="mobile-pause-overlay" aria-label="Pause menu">
     <div class="mob-overlay-box">
       <div class="mob-overlay-title">PAUSED</div>
       <button class="mob-overlay-btn primary" id="mob-resume">▶ RESUME</button>
-      <button class="mob-overlay-btn" id="mob-restart">↺ RESTART</button>
-      <button class="mob-overlay-btn danger" id="mob-menu">⌂ MENU</button>
+      <button class="mob-overlay-btn"         id="mob-restart">↺ RESTART</button>
+      <button class="mob-overlay-btn danger"   id="mob-menu">⌂ MENU</button>
     </div>
   </div>
 
-  <!-- Mobile level complete overlay -->
+  <!-- Mobile level complete -->
   <div id="mobile-complete-overlay" aria-label="Level complete">
     <div class="mob-overlay-box">
       <div class="mob-overlay-title" style="color:#2ecc71">LEVEL CLEAR!</div>
       <button class="mob-overlay-btn primary" id="mob-next">▶ NEXT LEVEL</button>
-      <button class="mob-overlay-btn" id="mob-replay">↺ REPLAY</button>
-      <button class="mob-overlay-btn danger" id="mob-complete-menu">⌂ MENU</button>
+      <button class="mob-overlay-btn"         id="mob-replay">↺ REPLAY</button>
+      <button class="mob-overlay-btn danger"   id="mob-complete-menu">⌂ MENU</button>
     </div>
   </div>
 
-  <!-- Mobile dead overlay -->
+  <!-- Mobile dead -->
   <div id="mobile-dead-overlay" aria-label="You died">
     <div class="mob-overlay-box">
       <div class="mob-overlay-title" style="color:#cc0000">YOU DIED</div>
       <button class="mob-overlay-btn primary" id="mob-dead-restart">↺ RESTART</button>
-      <button class="mob-overlay-btn danger" id="mob-dead-menu">⌂ MENU</button>
+      <button class="mob-overlay-btn danger"   id="mob-dead-menu">⌂ MENU</button>
     </div>
   </div>
 </main>
 
-<!-- ══ PANELS CONTAINER — all panels center themselves ═ -->
+<!-- ════════════════════════════════════════════════
+     PANELS
+     ════════════════════════════════════════════════ -->
 <div id="panels-container">
 
-  <!-- ── MAIN MENU (level select) ──────────────────── -->
+  <!-- Level select -->
   <div class="tep-panel hidden" id="main-menu">
-    <div class="panel-box" style="max-width:900px;text-align:center;">
+    <div class="panel-box" style="max-width:920px;text-align:center;">
       <button class="close-btn" onclick="TEP.UI.hideAll();showMainLaunchpad()">✕</button>
       <div class="hero-title">SELECT LEVEL</div>
       <div class="section-title" id="level-select-title">— CAMPAIGN —</div>
       <div id="level-grid"></div>
-      <div style="margin-top:18px;font-family:var(--px);font-size:7px;color:#556;line-height:2;">
+      <div style="margin-top:18px;font-family:var(--px);font-size:7px;color:#556;line-height:2.2;">
         🎮 MOVE: A D / ← →&nbsp;&nbsp;&nbsp;JUMP: W / SPACE&nbsp;&nbsp;&nbsp;ECHO: E&nbsp;&nbsp;&nbsp;RESTART: R&nbsp;&nbsp;&nbsp;PAUSE: ESC
       </div>
     </div>
   </div>
 
-  <!-- ── AUTH PANEL ──────────────────────────────── -->
+  <!-- Auth -->
   <div class="tep-panel hidden" id="auth-panel">
     <div class="panel-box" style="max-width:420px;">
       <button class="close-btn" onclick="TEP.UI.hideAll()">✕</button>
@@ -952,7 +268,7 @@
     </div>
   </div>
 
-  <!-- ── SHOP ──────────────────────────────────────── -->
+  <!-- Shop -->
   <div class="tep-panel hidden" id="shop-panel">
     <div class="panel-box" style="max-width:800px;">
       <button class="close-btn" onclick="TEP.UI.hideAll()">✕</button>
@@ -968,7 +284,7 @@
     </div>
   </div>
 
-  <!-- ── LEADERBOARD ────────────────────────────────── -->
+  <!-- Leaderboard -->
   <div class="tep-panel hidden" id="lb-panel">
     <div class="panel-box" style="max-width:700px;">
       <button class="close-btn" onclick="TEP.UI.hideAll()">✕</button>
@@ -998,7 +314,9 @@
       </div>
       <table class="lb-table">
         <thead><tr><th>#</th><th>PLAYER</th><th>SCORE</th><th>TIME</th><th>ECHOES</th></tr></thead>
-        <tbody id="lb-body"><tr><td colspan="5" style="color:#556;padding:20px;">Sign in and play to see scores!</td></tr></tbody>
+        <tbody id="lb-body">
+          <tr><td colspan="5" style="color:#556;padding:20px;font-family:var(--px);font-size:7px;">Sign in and play to see scores!</td></tr>
+        </tbody>
       </table>
       <div style="margin-top:16px;text-align:right;">
         <button class="nav-btn" onclick="TEP.UI.hideAll()">← Back</button>
@@ -1006,7 +324,7 @@
     </div>
   </div>
 
-  <!-- ── ACHIEVEMENTS ───────────────────────────────── -->
+  <!-- Achievements -->
   <div class="tep-panel hidden" id="ach-panel">
     <div class="panel-box" style="max-width:760px;">
       <button class="close-btn" onclick="TEP.UI.hideAll()">✕</button>
@@ -1018,7 +336,7 @@
     </div>
   </div>
 
-  <!-- ── HELP ──────────────────────────────────────── -->
+  <!-- Help -->
   <div class="tep-panel hidden" id="help-panel">
     <div class="panel-box" style="max-width:680px;">
       <button class="close-btn" onclick="TEP.UI.hideAll()">✕</button>
@@ -1036,8 +354,8 @@
           <div class="ctrl-row"><span class="ctrl-key">ENTER</span><span class="ctrl-desc">Next level</span></div>
         </div>
       </div>
-      <div style="margin-top:22px;font-family:var(--px);font-size:7px;color:#ccc;line-height:2.2;">
-        <p>Record up to <b style="color:#00d4ff">3 echoes</b> simultaneously. Each echo replays your recorded inputs.</p>
+      <div style="margin-top:22px;font-family:var(--px);font-size:7px;color:#ccc;line-height:2.4;">
+        <p>Record up to <b style="color:#00d4ff">3 echoes</b> simultaneously. Each replays your recorded inputs.</p>
         <p style="margin-top:10px;">Use echoes to hold <b style="color:#ffd166">switches</b>, block <b style="color:#ff4455">enemies</b>, and stand on <b style="color:#7efff5">pressure plates</b>.</p>
         <p style="margin-top:10px;color:#556;">
           🫧 <b style="color:#cc44ff">Wisps</b> — corrupt recordings<br/>
@@ -1055,7 +373,9 @@
 
 </div><!-- end panels-container -->
 
-<!-- ══ SCRIPTS ════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════
+     SCRIPTS
+     ════════════════════════════════════════════════ -->
 <script src="/config.js"></script>
 <script src="/supabase-client.js"></script>
 <script src="/auth.js"></script>
@@ -1067,11 +387,105 @@
 <script src="/ui.js"></script>
 
 <script>
-/* ── Panorama background renderer ─────────────────────── */
+/* ════════════════════════════════════════════════════════
+   THEME-BASED PARALLAX PANORAMA — randomized in-game themes
+   ════════════════════════════════════════════════════════ */
 (function() {
   const canvas = document.getElementById('panorama-canvas');
-  const ctx = canvas.getContext('2d');
+  const ctx    = canvas.getContext('2d');
   let W, H, t = 0;
+
+  /* ─── Themes ─────────────────────────────────────────── */
+  const THEMES = [
+    {
+      name: 'neon_cave',
+      skyTop: '#000510', skyBot: '#0a0020',
+      fogColor: 'rgba(80,0,180,{a})',
+      groundColors: ['#0a0028','#120038','#1a0050'],
+      crystalColor: 'rgba(160,60,255,{a})',
+      lavaColor: null,
+      starColor: '#cc88ff',
+      accentGlow: 'rgba(120,40,255,{a})',
+      platformColor: 'rgba(90,20,200,{a})',
+      platformTop: 'rgba(140,60,255,{a})',
+    },
+    {
+      name: 'lava_world',
+      skyTop: '#080004', skyBot: '#200008',
+      fogColor: 'rgba(180,20,0,{a})',
+      groundColors: ['#1a0800','#280e00','#3a1200'],
+      crystalColor: 'rgba(255,80,0,{a})',
+      lavaColor: 'rgba(255,60,0,{a})',
+      starColor: '#ff8844',
+      accentGlow: 'rgba(255,40,0,{a})',
+      platformColor: 'rgba(80,20,0,{a})',
+      platformTop: 'rgba(200,60,0,{a})',
+    },
+    {
+      name: 'ice_world',
+      skyTop: '#000c20', skyBot: '#001840',
+      fogColor: 'rgba(0,100,200,{a})',
+      groundColors: ['#001428','#001e3c','#002850'],
+      crystalColor: 'rgba(100,200,255,{a})',
+      lavaColor: null,
+      starColor: '#aaddff',
+      accentGlow: 'rgba(0,180,255,{a})',
+      platformColor: 'rgba(0,60,120,{a})',
+      platformTop: 'rgba(80,200,255,{a})',
+    },
+    {
+      name: 'forest',
+      skyTop: '#000e04', skyBot: '#001808',
+      fogColor: 'rgba(0,80,30,{a})',
+      groundColors: ['#001208','#001a10','#002218'],
+      crystalColor: 'rgba(60,255,100,{a})',
+      lavaColor: null,
+      starColor: '#88ffaa',
+      accentGlow: 'rgba(0,200,60,{a})',
+      platformColor: 'rgba(10,60,20,{a})',
+      platformTop: 'rgba(40,200,80,{a})',
+    },
+    {
+      name: 'space',
+      skyTop: '#000008', skyBot: '#000018',
+      fogColor: 'rgba(30,0,60,{a})',
+      groundColors: ['#050010','#080018','#0a0020'],
+      crystalColor: 'rgba(200,100,255,{a})',
+      lavaColor: null,
+      starColor: '#ffffff',
+      accentGlow: 'rgba(100,60,255,{a})',
+      platformColor: 'rgba(20,10,50,{a})',
+      platformTop: 'rgba(120,60,255,{a})',
+    },
+  ];
+
+  /* Pick a random theme and schedule the next change */
+  let currentTheme = THEMES[Math.floor(Math.random() * THEMES.length)];
+  let nextTheme    = THEMES[Math.floor(Math.random() * THEMES.length)];
+  let themeLerp    = 0;
+  const THEME_DUR  = 18; // seconds before cross-fade
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function parseRGB(hex) {
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    return [r,g,b];
+  }
+  function lerpHex(a, b, t) {
+    const ra = parseRGB(a), rb = parseRGB(b);
+    return `rgb(${Math.round(lerp(ra[0],rb[0],t))},${Math.round(lerp(ra[1],rb[1],t))},${Math.round(lerp(ra[2],rb[2],t))})`;
+  }
+  function themeColor(template, alpha, theme) {
+    return template.replace('{a}', alpha.toFixed(3));
+  }
+  function blendThemeColor(templateA, templateB, alpha, blendT) {
+    // parse rgba from both and lerp
+    const ca = themeColor(templateA, alpha, null);
+    const cb = themeColor(templateB, alpha, null);
+    return blendT < 0.01 ? ca : blendT > 0.99 ? cb : ca; // simplified - just use current
+  }
 
   function resize() {
     W = canvas.width  = window.innerWidth;
@@ -1080,41 +494,38 @@
   resize();
   window.addEventListener('resize', resize);
 
+  /* Seeded RNG for stable stars */
   function rng(seed) {
     let s = seed;
-    return function() {
-      s = (s * 16807 + 0) % 2147483647;
-      return (s - 1) / 2147483646;
-    };
+    return () => { s = (s * 16807) % 2147483647; return (s-1)/2147483646; };
   }
-
-  const starRng = rng(12345);
-  const STARS = Array.from({length: 120}, (_, i) => ({
-    x: starRng(),
-    y: starRng() * 0.65,
-    size: i % 7 === 0 ? 3 : i % 3 === 0 ? 2 : 1,
+  const starRng = rng(42069);
+  const STARS = Array.from({length:160}, (_, i) => ({
+    x: starRng(), y: starRng() * 0.70,
+    size: i % 8 === 0 ? 3 : i % 3 === 0 ? 2 : 1,
     twinkle: starRng() * Math.PI * 2,
-    speed: 0.3 + starRng() * 1.2,
+    speed: 0.15 + starRng() * 0.8,
+    layer: Math.floor(starRng() * 3), // 0=far,1=mid,2=close
   }));
 
-  const PLATFORMS = [
-    {x:0.08, y:0.62, w:0.12, h:0.04, depth:1},
-    {x:0.22, y:0.52, w:0.09, h:0.035, depth:2},
-    {x:0.38, y:0.44, w:0.11, h:0.04, depth:1.5},
-    {x:0.55, y:0.58, w:0.08, h:0.03, depth:2},
-    {x:0.70, y:0.48, w:0.13, h:0.04, depth:1},
-    {x:0.88, y:0.55, w:0.10, h:0.035, depth:1.8},
-    {x:0.45, y:0.32, w:0.08, h:0.03, depth:3},
-    {x:0.15, y:0.38, w:0.09, h:0.03, depth:3},
-    {x:0.78, y:0.35, w:0.07, h:0.025, depth:3},
+  /* Procedural 3D platforms — multiple depth layers */
+  const PLATFORM_LAYERS = [
+    // far (small, slow)
+    Array.from({length:6}, (_, i) => ({ x: i/6 + Math.random()*0.1, y: 0.30+Math.random()*0.20, w:0.06+Math.random()*0.04, depth:3 })),
+    // mid
+    Array.from({length:5}, (_, i) => ({ x: i/5 + Math.random()*0.08, y: 0.45+Math.random()*0.18, w:0.08+Math.random()*0.05, depth:2 })),
+    // near (large, fast)
+    Array.from({length:4}, (_, i) => ({ x: i/4 + Math.random()*0.06, y: 0.60+Math.random()*0.12, w:0.10+Math.random()*0.06, depth:1 })),
   ];
 
-  function hill(camX, baseY, amp, freq, parallax) {
+  /* Sinusoidal hills */
+  function hill(camX, baseY, amp, freq, parallax, color) {
     const off = camX * parallax;
+    ctx.fillStyle = color;
     ctx.beginPath();
     ctx.moveTo(0, H);
-    for (let x = 0; x <= W + 8; x += 4) {
-      const y = baseY + Math.sin((x + off) * freq) * amp + Math.sin((x + off) * freq * 2.3) * amp * 0.35;
+    for (let x = 0; x <= W+8; x += 4) {
+      const y = baseY + Math.sin((x+off)*freq)*amp + Math.sin((x+off)*freq*2.3)*amp*0.3;
       ctx.lineTo(x, y);
     }
     ctx.lineTo(W, H);
@@ -1122,99 +533,232 @@
     ctx.fill();
   }
 
-  function frame() {
-    t += 0.004;
-    const camX = t * 60;
+  /* Crystal spires (theme decoration) */
+  function drawCrystals(camX, theme, blend) {
+    const seeds = [0.1,0.22,0.38,0.50,0.63,0.77,0.88];
+    seeds.forEach((sx, i) => {
+      const px = ((sx - (t * 0.025) % 1 + 1) % 1) * W;
+      const baseH = (0.06 + (i%3)*0.04) * H;
+      const baseY = H * 0.68;
+      const alpha = 0.12 + Math.sin(t * 0.8 + i) * 0.05;
+      ctx.fillStyle = theme.crystalColor.replace('{a}', alpha.toFixed(3));
+      ctx.beginPath();
+      ctx.moveTo(px - 6, baseY);
+      ctx.lineTo(px,     baseY - baseH);
+      ctx.lineTo(px + 6, baseY);
+      ctx.closePath();
+      ctx.fill();
+      // glow
+      const grad = ctx.createLinearGradient(px, baseY - baseH, px, baseY);
+      grad.addColorStop(0, theme.crystalColor.replace('{a}', (alpha * 0.8).toFixed(3)));
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(px - 8, baseY);
+      ctx.lineTo(px,     baseY - baseH - 8);
+      ctx.lineTo(px + 8, baseY);
+      ctx.closePath();
+      ctx.fill();
+    });
+  }
 
+  /* Lava pools (for hot themes) */
+  function drawLava(theme) {
+    if (!theme.lavaColor) return;
+    const lp = (Math.sin(t * 2.1) + 1) * 0.5;
+    ctx.fillStyle = theme.lavaColor.replace('{a}', (0.06 + lp*0.05).toFixed(3));
+    ctx.fillRect(0, H * 0.84, W, H * 0.16);
+    ctx.fillStyle = theme.lavaColor.replace('{a}', (0.10 + lp*0.08).toFixed(3));
+    ctx.fillRect(0, H * 0.91, W, H * 0.09);
+    ctx.fillStyle = theme.lavaColor.replace('{a}', (0.16 + lp*0.12).toFixed(3));
+    ctx.fillRect(0, H * 0.96, W, H * 0.04);
+  }
+
+  /* Floating dust motes */
+  const MOTES = Array.from({length:30}, () => ({
+    x: Math.random(), y: Math.random(),
+    r: 1 + Math.random() * 3,
+    vx: (Math.random()-0.5)*0.15,
+    vy: -0.05 - Math.random()*0.2,
+    life: Math.random(),
+  }));
+
+  function drawMotes(theme) {
+    MOTES.forEach(m => {
+      m.x += m.vx / W; m.y += m.vy / H; m.life += 0.002;
+      if (m.y < -0.02) { m.y = 1.02; m.x = Math.random(); }
+      const alpha = 0.12 + Math.sin(m.life * 4) * 0.08;
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = theme.starColor;
+      ctx.fillRect(Math.floor(m.x*W), Math.floor(m.y*H), m.r, m.r);
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  /* Atmospheric god-rays */
+  function drawGodRays(theme) {
+    const rayAlpha = 0.018 + Math.sin(t*0.5)*0.008;
+    ctx.save();
+    ctx.globalAlpha = rayAlpha;
+    for (let i = 0; i < 5; i++) {
+      const x = W * (0.15 + i * 0.18 + Math.sin(t*0.3 + i)*0.04);
+      const grad = ctx.createLinearGradient(x, 0, x + W*0.08, H*0.8);
+      grad.addColorStop(0, theme.accentGlow.replace('{a}','1'));
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(x - W*0.015, 0);
+      ctx.lineTo(x + W*0.015, 0);
+      ctx.lineTo(x + W*0.10, H*0.9);
+      ctx.lineTo(x - W*0.08, H*0.9);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  let lastTime = 0;
+  function frame(timestamp) {
+    const dt = Math.min((timestamp - lastTime) / 1000, 0.05);
+    lastTime = timestamp;
+    t += dt;
+
+    /* Theme cross-fade timing */
+    themeLerp = Math.min(1, t / THEME_DUR);
+    if (t >= THEME_DUR + 3) {
+      currentTheme = nextTheme;
+      nextTheme = THEMES[Math.floor(Math.random() * THEMES.length)];
+      t = 0; themeLerp = 0;
+    }
+    const blend = Math.max(0, (t - THEME_DUR) / 3); // 3s cross-fade
+    const th = currentTheme; // simplified: just use current
+
+    const camX = t * 55;
+
+    /* SKY */
     const sky = ctx.createLinearGradient(0, 0, 0, H);
-    sky.addColorStop(0,   '#000814');
-    sky.addColorStop(0.4, '#040d22');
-    sky.addColorStop(0.7, '#080518');
-    sky.addColorStop(1,   '#0a0000');
+    sky.addColorStop(0,   th.skyTop);
+    sky.addColorStop(0.5, th.skyBot);
+    sky.addColorStop(1,   th.groundColors[0]);
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, W, H);
 
+    /* GOD RAYS */
+    drawGodRays(th);
+
+    /* ATMOSPHERIC FOG BANDS */
+    for (let i = 0; i < 3; i++) {
+      const fy = H * (0.20 + i * 0.18);
+      const fw = H * (0.08 - i * 0.01);
+      const fa = 0.025 - i * 0.007;
+      ctx.fillStyle = th.fogColor.replace('{a}', fa.toFixed(4));
+      ctx.fillRect(0, fy, W, fw);
+    }
+
+    /* STARS */
     STARS.forEach(s => {
-      const sx = ((s.x - (t * s.speed * 0.008) % 1 + 1) % 1) * W;
-      const sy = s.y * H;
-      const alpha = 0.4 + Math.sin(t * 1.5 + s.twinkle) * 0.35;
-      ctx.globalAlpha = alpha;
-      ctx.fillStyle = '#ffffff';
+      const parallaxFactor = [0.004, 0.010, 0.022][s.layer];
+      const sx = ((s.x - (t * parallaxFactor) % 1 + 1) % 1) * W;
+      const sy = s.y * H * 0.72;
+      const twinkle = 0.3 + Math.sin(t * 1.2 + s.twinkle) * 0.35;
+      ctx.globalAlpha = twinkle;
+      ctx.fillStyle = th.starColor;
       ctx.fillRect(Math.floor(sx), Math.floor(sy), s.size, s.size);
     });
     ctx.globalAlpha = 1;
 
-    const pulse = (Math.sin(t * 0.8) + 1) * 0.5;
-    ctx.fillStyle = `rgba(100,20,200,${0.025 + pulse * 0.015})`;
-    ctx.fillRect(W * 0.1, H * 0.05, W * 0.4, H * 0.45);
-    ctx.fillStyle = `rgba(0,80,200,${0.02 + pulse * 0.01})`;
-    ctx.fillRect(W * 0.55, H * 0.08, W * 0.4, H * 0.40);
+    /* DISTANT NEBULA (subtle) */
+    const pulse = (Math.sin(t * 0.6) + 1) * 0.5;
+    ctx.fillStyle = th.accentGlow.replace('{a}', (0.018 + pulse * 0.010).toFixed(4));
+    ctx.fillRect(W * 0.05, H * 0.03, W * 0.45, H * 0.42);
+    ctx.fillStyle = th.crystalColor.replace('{a}', (0.012 + pulse * 0.008).toFixed(4));
+    ctx.fillRect(W * 0.50, H * 0.06, W * 0.44, H * 0.36);
 
-    ctx.fillStyle = '#0a0520';
-    hill(camX, H * 0.58, H * 0.14, 0.003, 0.04);
-    ctx.fillStyle = '#100a38';
-    hill(camX, H * 0.66, H * 0.12, 0.005, 0.10);
-    ctx.fillStyle = '#180e48';
-    hill(camX, H * 0.74, H * 0.10, 0.007, 0.22);
+    /* HILLS — 3 layers with different parallax */
+    hill(camX, H * 0.56, H*0.14, 0.0030, 0.040, th.groundColors[0]);
+    hill(camX, H * 0.64, H*0.12, 0.0050, 0.090, th.groundColors[1]);
+    hill(camX, H * 0.74, H*0.10, 0.0075, 0.200, th.groundColors[2]);
 
-    PLATFORMS.forEach(p => {
-      const parallax = p.depth * 0.06;
-      const px = ((p.x - (t * parallax * 0.3) % 1 + 1) % 1) * W;
-      const py = p.y * H;
-      const pw = p.w * W;
-      const ph = p.h * H;
-      ctx.fillStyle = `rgba(20,10,50,0.82)`;
-      ctx.fillRect(Math.floor(px), Math.floor(py + ph * 0.4), Math.floor(pw), Math.floor(ph * 0.7));
-      ctx.fillStyle = `rgba(30,15,60,0.7)`;
-      ctx.fillRect(Math.floor(px), Math.floor(py), Math.floor(pw), Math.floor(ph * 0.5));
-      ctx.fillStyle = `rgba(120,60,255,0.15)`;
-      ctx.fillRect(Math.floor(px), Math.floor(py), Math.floor(pw), 2);
+    /* CRYSTALS / SPIRES */
+    drawCrystals(camX, th, blend);
+
+    /* PLATFORM LAYERS — 3D depth */
+    PLATFORM_LAYERS.forEach((layer, li) => {
+      layer.forEach(p => {
+        const spd = [0.010, 0.022, 0.050][li];
+        const scale = [0.55, 0.75, 1.0][li];
+        const px = ((p.x - (t * spd) % 1 + 1) % 1) * W;
+        const py = p.y * H;
+        const pw = p.w * W * scale;
+        const ph = Math.max(6, 0.035 * H * scale);
+        const depthAlpha = [0.55, 0.70, 0.85][li];
+
+        /* shadow */
+        ctx.fillStyle = `rgba(0,0,0,0.35)`;
+        ctx.fillRect(Math.floor(px+4), Math.floor(py+ph*0.6+4), Math.floor(pw), Math.floor(ph*0.5));
+
+        /* body */
+        ctx.fillStyle = th.platformColor.replace('{a}', (depthAlpha * 0.9).toFixed(3));
+        ctx.fillRect(Math.floor(px), Math.floor(py + ph*0.35), Math.floor(pw), Math.floor(ph*0.7));
+
+        /* top face (lighter) */
+        ctx.fillStyle = th.platformColor.replace('{a}', (depthAlpha * 0.7).toFixed(3));
+        ctx.fillRect(Math.floor(px), Math.floor(py), Math.floor(pw), Math.floor(ph*0.42));
+
+        /* glow strip on top */
+        ctx.fillStyle = th.platformTop.replace('{a}', (0.25 + Math.sin(t*1.2 + li*2)*0.08).toFixed(3));
+        ctx.fillRect(Math.floor(px+2), Math.floor(py), Math.floor(pw-4), 2);
+      });
     });
 
-    const lavaPulse = (Math.sin(t * 2.2) + 1) * 0.5;
-    ctx.fillStyle = `rgba(255,50,0,${0.05 + lavaPulse * 0.04})`;
-    ctx.fillRect(0, H * 0.85, W, H * 0.15);
-    ctx.fillStyle = `rgba(255,100,0,${0.08 + lavaPulse * 0.06})`;
-    ctx.fillRect(0, H * 0.91, W, H * 0.09);
-    ctx.fillStyle = `rgba(255,150,20,${0.12 + lavaPulse * 0.08})`;
-    ctx.fillRect(0, H * 0.96, W, H * 0.04);
+    /* LAVA */
+    drawLava(th);
 
-    ctx.fillStyle = '#080210';
-    ctx.fillRect(0, H * 0.88, W, H * 0.12);
+    /* GROUND BASE */
+    const gGrad = ctx.createLinearGradient(0, H*0.82, 0, H);
+    gGrad.addColorStop(0, th.groundColors[2]);
+    gGrad.addColorStop(1, th.skyTop);
+    ctx.fillStyle = gGrad;
+    ctx.fillRect(0, Math.floor(H*0.88), W, Math.ceil(H*0.12));
+
+    /* MOTES */
+    drawMotes(th);
 
     requestAnimationFrame(frame);
   }
-  frame();
+  requestAnimationFrame(frame);
 })();
 
-/* ── Floating pixel particles ──────────────────────────── */
+/* ════════════════════════════════════════════════════════
+   FLOATING PIXEL PARTICLES
+   ════════════════════════════════════════════════════════ */
 (function() {
   const canvas = document.getElementById('particles');
-  const ctx = canvas.getContext('2d');
+  const ctx    = canvas.getContext('2d');
   let W, H;
   function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
   resize();
   window.addEventListener('resize', resize);
 
-  const COLORS = ['#00d4ff','#aa44ff','#ff4455','#ffd700','#44cc22','#ff8833'];
-  const parts = Array.from({length: 28}, (_, i) => ({
+  const COLORS = ['#00d4ff','#aa44ff','#ff4455','#ffd700','#44cc22','#ff8833','#7efff5','#ff7ef4'];
+  const parts = Array.from({length:35}, (_, i) => ({
     x: Math.random() * window.innerWidth,
     y: Math.random() * window.innerHeight,
-    size: 2 + Math.floor(Math.random() * 4),
-    vx: (Math.random() - 0.5) * 0.4,
-    vy: -0.2 - Math.random() * 0.5,
+    size: 1 + Math.floor(Math.random() * 3),
+    vx: (Math.random()-0.5) * 0.35,
+    vy: -0.15 - Math.random() * 0.45,
     color: COLORS[i % COLORS.length],
-    alpha: 0.2 + Math.random() * 0.4,
+    alpha: 0.15 + Math.random() * 0.35,
     life: Math.random(),
   }));
 
   function frame() {
     ctx.clearRect(0, 0, W, H);
     parts.forEach(p => {
-      p.x += p.vx; p.y += p.vy; p.life += 0.003;
-      if (p.y < -10) { p.y = H + 5; p.x = Math.random() * W; p.life = 0; }
-      const a = p.alpha * (0.5 + Math.sin(p.life * 3) * 0.5);
-      ctx.globalAlpha = a;
+      p.x += p.vx; p.y += p.vy; p.life += 0.002;
+      if (p.y < -8) { p.y = H + 5; p.x = Math.random() * W; p.life = 0; }
+      const a = p.alpha * (0.4 + Math.sin(p.life * 3.5) * 0.5);
+      ctx.globalAlpha = Math.max(0, a);
       ctx.fillStyle = p.color;
       ctx.fillRect(Math.floor(p.x), Math.floor(p.y), p.size, p.size);
     });
@@ -1224,148 +768,94 @@
   frame();
 })();
 
-/* ── Splash texts ─────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════
+   SPLASH TEXTS
+   ════════════════════════════════════════════════════════ */
 const SPLASH_COMMON = [
-  'Now with Echoes!', 
-  'Time is a flat circle!', 
-  'Your past self is judging you.',
-  'Paradox-proof!', 
-  '99% echo-free!', 
-  'Speed-running the timeline!',
-  'More lava than necessary!', 
-  'Wisps not included.', 
-  'Not responsible for paradoxes.',
-  'Your echo is watching.', 
-  '3 echoes walk into a bar...', 
-  'Totally certified time travel!',
-  'Gravity: still a thing.', 
-  'The lava is decorative. (It\'s not.)',
-
-  'You vs You vs You.',
-  'Past mistakes included for free.',
-  'Fix it. Break it. Repeat.',
-  'Time doesn’t heal. It replays.',
-  'Echoes remember everything.',
-  'Skill issue across timelines.',
-  'Outrun your own decisions.',
-  'Desync detected.',
-  'Timeline integrity: questionable.',
-  'You can’t undo—only outplay.',
-  'Every frame is recorded.',
-  'History will repeat. Literally.',
-  "Echo-location: Found you.",
-"Don't cross the streams.",
-"Your past self had a plan. It failed.",
-"Lava: The floor is actually lava.",
-"Wait, which one am I?",
-"Recursion is a dish best served cold.",
-"Stop hitting yourself.",
-"1.21 Gigawatts of regret.",
-"The timeline is a suggestion.",
-"Your Echoes are unionizing.",
+  'Now with Echoes!', 'Time is a flat circle!', 'Your past self is judging you.',
+  'Paradox-proof!', '99% echo-free!', 'Speed-running the timeline!',
+  'More lava than necessary!', 'Wisps not included.', 'Not responsible for paradoxes.',
+  'Your echo is watching.', '3 echoes walk into a bar...', 'Totally certified time travel!',
+  'Gravity: still a thing.', "The lava is decorative. (It's not.)",
+  'You vs You vs You.', 'Past mistakes included for free.', 'Fix it. Break it. Repeat.',
+  "Time doesn't heal. It replays.", 'Echoes remember everything.', 'Skill issue across timelines.',
+  'Outrun your own decisions.', 'Desync detected.', 'Timeline integrity: questionable.',
+  "You can't undo—only outplay.", 'Every frame is recorded.', 'History will repeat. Literally.',
+  'Echo-location: Found you.', "Don't cross the streams.",
+  'Your past self had a plan. It failed.', 'Wait, which one am I?',
+  "Stop hitting yourself.", "The timeline is a suggestion.", "Your Echoes are unionizing.",
 ];
-
 const SPLASH_RARE = [
-  'Your best run already happened.',
-  'Your ghost is faster than you.',
-  'Parallel you is laughing.',
-  'You already tried that.',
-  'This felt easier last timeline.',
-  'Your inputs are permanent.',
-  'Outplay your past. Or join it.',
-  'One move. Infinite consequences.',
-  'Cause meets effect… eventually.',
-  'Multiple yous. Same problem.',
-  'The ghost in the machine is just you.',
-  'You’re your own biggest obstacle.',
-  'Statistically, you’ve done this before.',
-  'A glitch in the replay.',
-  'Your Echo is currently winning.',
-  'Deja vu? No, just bad routing.',
-  'Destiny is just a recorded input.',
-  'Synchronize or perish.',
-  'The loop is closing.',
-  'Your past self knows what you did.',
+  'Your best run already happened.', 'Your ghost is faster than you.',
+  'Parallel you is laughing.', 'You already tried that.',
+  'This felt easier last timeline.', 'Your inputs are permanent.',
+  'Outplay your past. Or join it.', 'One move. Infinite consequences.',
+  'Cause meets effect… eventually.', 'Multiple yous. Same problem.',
+  "The ghost in the machine is just you.", "You're your own biggest obstacle.",
+  "Statistically, you've done this before.", 'A glitch in the replay.',
+  'Your Echo is currently winning.', "Deja vu? No, just bad routing.",
+  'Destiny is just a recorded input.', 'Synchronize or perish.',
+  'The loop is closing.', 'Your past self knows what you did.',
 ];
-
 const SPLASH_ULTRA = [
-  'TODO: remove this splash.',
-  'who let this into production?',
-  'console.log("why")',
-  'it works on my machine.',
-  'undefined behavior achieved.',
-  'fix later (never).',
-  'temporary solution™',
-  'magic number strikes again.',
-  'this is definitely intentional.',
-  '// don’t touch this',
-  'refactor? nah.',
-  'one more patch should fix it.',
-  'edge case? what edge case?',
-  'ship it.',
-  'if it compiles, it’s done.',
-  '99 little bugs in the code…',
-  'works perfectly. do not test.',
-  'this seemed like a good idea at 2am.',
-  'not a bug. a feature.',
-  'try/catch and pray.',
-  'Object.assign(player, { luck: 0 });',
-  'Who needs documentation?',
-  'Legacy code: DO NOT DELETE',
-  'It’s a feature, until it crashes.',
-  '// TODO: Write better splash texts',
-  '404: Timeline Not Found',
-  'Memory leak? More like memory lane.',
-  'Hotfixed (mostly).',
-  'Optimized for 1FPS.',
-  'Works on localhost:3000.',
-  'git commit -m "fixed stuff"',
-  'Uncaught TypeError: life is undefined',
+  'TODO: remove this splash.', "who let this into production?",
+  'console.log("why")', 'it works on my machine.',
+  'undefined behavior achieved.', 'fix later (never).', 'temporary solution™',
+  'magic number strikes again.', 'this is definitely intentional.',
+  "// don't touch this", 'refactor? nah.', 'one more patch should fix it.',
+  "edge case? what edge case?", 'ship it.', "if it compiles, it's done.",
+  '99 little bugs in the code…', 'works perfectly. do not test.',
+  "this seemed like a good idea at 2am.", "not a bug. a feature.", 'try/catch and pray.',
+  'Object.assign(player, { luck: 0 });', 'Who needs documentation?',
+  'Legacy code: DO NOT DELETE', "It's a feature, until it crashes.",
+  '// TODO: Write better splash texts', '404: Timeline Not Found',
+  "Memory leak? More like memory lane.", 'Hotfixed (mostly).',
+  'Optimized for 1FPS.', 'Works on localhost:3000.',
+  'git commit -m "fixed stuff"', 'Uncaught TypeError: life is undefined',
 ];
-const splash = document.getElementById('splash');
-
-function pick(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 function getSplashText() {
-  const roll = Math.random();
-
-  if (roll < 0.01) return pick(SPLASH_ULTRA); // 1%
-  if (roll < 0.09) return pick(SPLASH_RARE);  // next 8%
-  return pick(SPLASH_COMMON);                // 91%
+  const r = Math.random();
+  if (r < 0.01) return pick(SPLASH_ULTRA);
+  if (r < 0.09) return pick(SPLASH_RARE);
+  return pick(SPLASH_COMMON);
 }
+const splashEl = document.getElementById('splash');
+if (splashEl) splashEl.textContent = getSplashText();
 
-if (splash) {
-  splash.textContent = getSplashText();
-}
-
-/* ── Local toast ─────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════
+   TOAST
+   ════════════════════════════════════════════════════════ */
 function showToastLocal(msg, color) {
   if (window.TEP?.UI?.showToast) { TEP.UI.showToast(msg, color); return; }
-  const t = document.getElementById('toast');
-  if (!t) return;
-  t.textContent = msg; t.style.background = color||'#7efff5';
-  t.style.color='#000'; t.style.opacity='1'; t.style.transform='translateY(0)';
-  setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateY(-16px)'; }, 2500);
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.background = color ? `rgba(${color},0.15)` : 'rgba(126,255,245,0.12)';
+  el.style.color = '#fff';
+  el.style.opacity = '1';
+  el.style.transform = 'translateX(-50%) translateY(0)';
+  setTimeout(() => { el.style.opacity='0'; el.style.transform='translateX(-50%) translateY(-16px)'; }, 2500);
 }
 
-/* ── Show/hide main launchpad ─────────────────────────── */
+/* ════════════════════════════════════════════════════════
+   SHOW / HIDE MAIN LAUNCHPAD
+   ════════════════════════════════════════════════════════ */
 function showMainLaunchpad() {
   document.getElementById('main-game').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
-  document.getElementById('title-block').style.display = '';
-  document.getElementById('menu-container').style.display = 'flex';
-  document.getElementById('stats-bar').style.display = 'flex';
 }
 
-/* ── Patch TEP.Game to show canvas when a level starts ── */
+/* ════════════════════════════════════════════════════════
+   PATCH GAME — show canvas (transparent bg), parallax persists
+   ════════════════════════════════════════════════════════ */
 function patchGameForLaunchpad() {
   if (!window.TEP?.Game) return;
   const origStart   = TEP.Game.startLevel?.bind(TEP.Game);
   const origEndless = TEP.Game.startEndless?.bind(TEP.Game);
   const hideMenu = () => {
-    document.getElementById('main-game').style.display = 'block';
+    const mg = document.getElementById('main-game');
+    mg.style.display = 'flex';
     document.getElementById('app').style.display = 'none';
     document.querySelectorAll('.tep-panel').forEach(p => p.classList.add('hidden'));
   };
@@ -1373,10 +863,12 @@ function patchGameForLaunchpad() {
   if (origEndless) TEP.Game.startEndless = (...a) => { hideMenu(); origEndless(...a); };
 }
 
-/* ── Update stats bar ─────────────────────────────────── */
+/* ════════════════════════════════════════════════════════
+   STATS BAR
+   ════════════════════════════════════════════════════════ */
 function updateStatsBar() {
-  const lvl   = TEP.Auth?.getLevel?.() || 1;
-  const coins = TEP.Auth?.getCoins?.() || 0;
+  const lvl       = TEP.Auth?.getLevel?.() || 1;
+  const coins     = TEP.Auth?.getCoins?.() || 0;
   const themeKey  = TEP.LEVELS?.[lvl-1]?.theme || 'cave';
   const themeName = TEP.CONFIG?.THEMES?.[themeKey]?.name || themeKey;
   document.getElementById('stat-level').textContent = `LVL ${lvl}`;
@@ -1384,13 +876,14 @@ function updateStatsBar() {
   document.getElementById('stat-theme').textContent = themeName;
 }
 
-/* ── PWA install ─────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════
+   PWA
+   ════════════════════════════════════════════════════════ */
 let _pwaPrompt = null;
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault(); _pwaPrompt = e;
-  if (!localStorage.getItem('tep_pwa_dismissed')) {
+  if (!localStorage.getItem('tep_pwa_dismissed'))
     setTimeout(() => document.getElementById('pwa-banner')?.classList.add('show'), 8000);
-  }
 });
 document.getElementById('pwa-install-btn')?.addEventListener('click', () => {
   if (_pwaPrompt) {
@@ -1406,7 +899,9 @@ document.getElementById('pwa-dismiss-btn')?.addEventListener('click', () => {
   localStorage.setItem('tep_pwa_dismissed', '1');
 });
 
-/* ── Touch controls ───────────────────────────────────── */
+/* ════════════════════════════════════════════════════════
+   TOUCH CONTROLS
+   ════════════════════════════════════════════════════════ */
 function hookTouch(id, key) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -1422,22 +917,22 @@ if (recBtn) {
   recBtn.addEventListener('touchstart', e => {
     e.preventDefault();
     window.dispatchEvent(new KeyboardEvent('keydown', {key:'e'}));
-    setTimeout(()=>window.dispatchEvent(new KeyboardEvent('keyup',{key:'e'})),80);
+    setTimeout(() => window.dispatchEvent(new KeyboardEvent('keyup', {key:'e'})), 80);
   }, {passive:false});
 }
 
-/* ── Mobile overlay helpers ───────────────────────────── */
+/* ════════════════════════════════════════════════════════
+   MOBILE OVERLAYS
+   ════════════════════════════════════════════════════════ */
 function hideMobileOverlays() {
-  document.getElementById('mobile-pause-overlay')?.classList.remove('active');
-  document.getElementById('mobile-complete-overlay')?.classList.remove('active');
-  document.getElementById('mobile-dead-overlay')?.classList.remove('active');
+  ['mobile-pause-overlay','mobile-complete-overlay','mobile-dead-overlay']
+    .forEach(id => document.getElementById(id)?.classList.remove('active'));
 }
 function showMobileOverlay(id) {
   hideMobileOverlays();
   document.getElementById(id)?.classList.add('active');
 }
 
-// Pause button
 document.getElementById('tc-pause')?.addEventListener('click', () => {
   const gs = TEP.Game.getState?.();
   if (gs === 'play' || gs === 'endless') {
@@ -1448,111 +943,100 @@ document.getElementById('tc-pause')?.addEventListener('click', () => {
     hideMobileOverlays();
   }
 });
-
-// Pause menu buttons
 document.getElementById('mob-resume')?.addEventListener('click', () => {
-  window.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape'}));
-  hideMobileOverlays();
+  window.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape'})); hideMobileOverlays();
 });
 document.getElementById('mob-restart')?.addEventListener('click', () => {
-  window.dispatchEvent(new KeyboardEvent('keydown', {key:'r'}));
-  hideMobileOverlays();
+  window.dispatchEvent(new KeyboardEvent('keydown', {key:'r'})); hideMobileOverlays();
 });
 document.getElementById('mob-menu')?.addEventListener('click', () => {
-  window.dispatchEvent(new KeyboardEvent('keydown', {key:'m'}));
-  hideMobileOverlays();
+  window.dispatchEvent(new KeyboardEvent('keydown', {key:'m'})); hideMobileOverlays();
 });
-
-// Level complete overlay buttons
 document.getElementById('mob-next')?.addEventListener('click', () => {
-  window.dispatchEvent(new KeyboardEvent('keydown', {key:'Enter'}));
-  hideMobileOverlays();
+  window.dispatchEvent(new KeyboardEvent('keydown', {key:'Enter'})); hideMobileOverlays();
 });
 document.getElementById('mob-replay')?.addEventListener('click', () => {
-  window.dispatchEvent(new KeyboardEvent('keydown', {key:'r'}));
-  hideMobileOverlays();
+  window.dispatchEvent(new KeyboardEvent('keydown', {key:'r'})); hideMobileOverlays();
 });
 document.getElementById('mob-complete-menu')?.addEventListener('click', () => {
-  window.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape'}));
-  hideMobileOverlays();
+  window.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape'})); hideMobileOverlays();
 });
-
-// Dead overlay buttons
 document.getElementById('mob-dead-restart')?.addEventListener('click', () => {
-  window.dispatchEvent(new KeyboardEvent('keydown', {key:'r'}));
-  hideMobileOverlays();
+  window.dispatchEvent(new KeyboardEvent('keydown', {key:'r'})); hideMobileOverlays();
 });
 document.getElementById('mob-dead-menu')?.addEventListener('click', () => {
-  window.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape'}));
-  hideMobileOverlays();
+  window.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape'})); hideMobileOverlays();
 });
 
-// Auto-show/hide mobile overlays based on game state changes
+/* Auto-show mobile overlays based on game state */
 setInterval(() => {
   const gs = TEP.Game?.getState?.();
-  const pauseEl = document.getElementById('mobile-pause-overlay');
+  const isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  if (!isMobile) return;
+  const pauseEl    = document.getElementById('mobile-pause-overlay');
   const completeEl = document.getElementById('mobile-complete-overlay');
-  const deadEl = document.getElementById('mobile-dead-overlay');
+  const deadEl     = document.getElementById('mobile-dead-overlay');
   if (!pauseEl) return;
-  // Only do something on mobile (coarse pointer)
-  if (!window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
   if (gs === 'complete' && !completeEl.classList.contains('active') && !pauseEl.classList.contains('active')) {
     showMobileOverlay('mobile-complete-overlay');
   } else if (gs === 'dead' && !deadEl.classList.contains('active')) {
-    // wait a tick so death animation starts
     setTimeout(() => { if (TEP.Game?.getState?.() === 'dead') showMobileOverlay('mobile-dead-overlay'); }, 700);
-  } else if ((gs === 'play' || gs === 'endless' || gs === 'menu') && (pauseEl.classList.contains('active') || completeEl.classList.contains('active') || deadEl.classList.contains('active'))) {
+  } else if ((gs === 'play' || gs === 'endless' || gs === 'menu') &&
+    (pauseEl.classList.contains('active') || completeEl.classList.contains('active') || deadEl.classList.contains('active'))) {
     hideMobileOverlays();
   }
 }, 120);
 
-/* ── Keyboard shortcuts ───────────────────────────────── */
+/* ════════════════════════════════════════════════════════
+   KEYBOARD SHORTCUTS
+   ════════════════════════════════════════════════════════ */
 window.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && TEP.Game.getState?.() === 'menu') { TEP.UI.hideAll(); }
+  if (e.key === 'Escape' && TEP.Game.getState?.() === 'menu') TEP.UI.hideAll();
 });
 
-/* ── BGM (autostart on first click) ──────────────────── */
+/* ════════════════════════════════════════════════════════
+   BGM
+   ════════════════════════════════════════════════════════ */
 document.addEventListener('click', () => {
   if (!window.__bgmStarted) {
     window.__bgmStarted = true;
     const audio = new Audio('time-capsule.mp3');
-    audio.loop = true; audio.volume = 0.5;
-    audio.play().catch(()=>{});
+    audio.loop = true; audio.volume = 0.45;
+    audio.play().catch(() => {});
     window.__bgm = audio;
   }
-}, {once:true});
+}, {once: true});
 
-/* ── PWA Service Worker ───────────────────────────────── */
+/* ════════════════════════════════════════════════════════
+   SERVICE WORKER
+   ════════════════════════════════════════════════════════ */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   });
 }
 
-/* ── Bootstrap ────────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════
+   BOOTSTRAP
+   ════════════════════════════════════════════════════════ */
 (async () => {
-  const canvas = document.getElementById('game-canvas');
-
   if (!window.TEP?.LEVELS) {
     try {
       const r = await fetch('levels.js');
-      const code = await r.text();
-      eval(code);
-    } catch(e) { console.error('Failed to load levels:', e); TEP.LEVELS = []; }
+      eval(await r.text());
+    } catch(e) { console.error('levels.js load failed:', e); TEP.LEVELS = []; }
   }
 
   if (window.TEP?.Sound?.init) {
     try { TEP.Sound.init(); } catch(e) {}
   }
 
+  const canvas = document.getElementById('game-canvas');
   const restored = await TEP.Auth.init();
   if (!restored) TEP.Auth.initGuest();
 
   TEP.Game.init(canvas);
   patchGameForLaunchpad();
-
-  const origShowMenu = TEP.UI.showMenu.bind(TEP.UI);
-  TEP.UI.showMenu = () => { origShowMenu(); };
 
   TEP.UI.updateNavBar();
   updateStatsBar();
@@ -1562,7 +1046,7 @@ if ('serviceWorker' in navigator) {
     TEP.UI.updateNavBar();
     TEP.UI.hideAll();
     updateStatsBar();
-    showToastLocal('👋 Logged out');
+    showToastLocal('👋 Logged out', '80,80,80');
   });
 })();
 </script>
