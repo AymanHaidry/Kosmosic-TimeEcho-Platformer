@@ -641,38 +641,3 @@ TEP.UI = (() => {
     showToast, updateNavBar, hideAll, _scrollToLevels,
   };
 })();
-TEP.UI.pauseGame = function () {
-  if (TEP.Game && TEP.Game.setPaused) {
-    TEP.Game.setPaused(true);
-  }
-  TEP.UI.showPanel('pause-panel');
-};
-
-TEP.UI.resumeGame = function () {
-  if (TEP.Game && TEP.Game.setPaused) {
-    TEP.Game.setPaused(false);
-  }
-  TEP.UI.hideAll();
-};
-
-TEP.UI.quitToMenu = function () {
-  if (TEP.Game && TEP.Game.setPaused) {
-    TEP.Game.setPaused(false);
-  }
-  document.getElementById('main-game').style.display = 'none';
-  showMainLaunchpad();
-  TEP.UI.hideAll();
-};
-
-document.getElementById('pause-btn').onclick = TEP.UI.pauseGame;
-
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    const panelOpen = !document.getElementById('pause-panel').classList.contains('hidden');
-    if (panelOpen) {
-      TEP.UI.resumeGame();
-    } else {
-      TEP.UI.pauseGame();
-    }
-  }
-});
