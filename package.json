@@ -2,19 +2,39 @@
   "name": "timeecho",
   "version": "1.0.0",
   "main": "main.js",
+  "description": "TimeEcho Platformer",
+  "author": "Ayman",
+
   "scripts": {
     "start": "electron .",
     "build": "electron-builder"
   },
+
   "devDependencies": {
     "electron": "^30.0.0",
     "electron-builder": "^24.0.0"
   },
+
   "build": {
     "appId": "com.timeecho.game",
     "productName": "TimeEcho",
+
+    "files": [
+      "**/*"
+    ],
+
     "win": {
-      "target": "nsis"
-    }
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+
+    "publish": null
   }
 }
