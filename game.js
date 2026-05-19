@@ -741,6 +741,24 @@ TEP.Game = (() => {
     ctx.font = '9px "Press Start 2P",monospace';
     ctx.fillText(causeLabels[deathCause] || '💥 PARADOXED', W/2, H/2 - 38);
 
+     // ── Dead screen ────────────────────────────────────
+  function drawDeadScreen() {
+    ctx.fillStyle = 'rgba(15,0,0,0.86)';
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.textAlign = 'center';
+    // Big YOU DIED
+    ctx.fillStyle = '#cc0000';
+    ctx.font = 'bold 30px "Press Start 2P",monospace';
+    ctx.fillText('YOU DIED', W/2, H/2 - 70);
+
+    // Cause chip
+    const causeLabels = { spike:'💀 IMPALED', lava:'🌋 INCINERATED', enemy:'👾 ELIMINATED',
+      fall:'🕳 FELL INTO VOID', laser:'⚡ VAPORIZED', generic:'💥 PARADOXED' };
+    ctx.fillStyle = '#ff4444';
+    ctx.font = '9px "Press Start 2P",monospace';
+    ctx.fillText(causeLabels[deathCause] || '💥 PARADOXED', W/2, H/2 - 38);
+
     // Death message (word wrap)
     ctx.fillStyle = '#ff8888';
     ctx.font = '8px "Press Start 2P",monospace';
@@ -853,6 +871,9 @@ TEP.Game = (() => {
         // BUG FIX: Allow restart ANY time after brief delay (deathTimer <= 60)
         if (deathTimer <= 60) {
           if (pressed('r')) {
+            // FIX 1: Force-clear stuck key state so mobile buttons work more than once
+            keys['r'] = false;
+            prevKeys['r'] = false;
             // Full state reset — fixes the "always dead after first death" bug
             deathHandled = false;
             deathCause = 'generic';
@@ -861,6 +882,8 @@ TEP.Game = (() => {
             state = 'play';
             TEP.Sound?.startBGM?.(level.theme || 'cave');
           } else if (pressed('escape')) {
+            keys['escape'] = false;
+            prevKeys['escape'] = false;
             deathHandled = false;
             deathCause = 'generic';
             state = 'menu';
@@ -872,9 +895,28 @@ TEP.Game = (() => {
       }
 
       case 'paused':
-        if (pressed('escape')) state = 'play';
-        if (pressed('r')) { deathHandled = false; deathCause = 'generic'; resetLevelState(); state = 'play'; }
-        if (pressed('m')) { deathHandled = false; deathCause = 'generic'; state = 'menu'; TEP.UI?.showMenu?.(); TEP.Sound?.stopBGM?.(); }
+        if (pressed('escape')) {
+          keys['escape'] = false;
+          prevKeys['escape'] = false;
+          state = 'play';
+        }
+        if (pressed('r')) {
+          keys['r'] = false;
+          prevKeys['r'] = false;
+          deathHandled = false;
+          deathCause = 'generic';
+          resetLevelState();
+          state = 'play';
+        }
+        if (pressed('m')) {
+          keys['m'] = false;
+          prevKeys['m'] = false;
+          deathHandled = false;
+          deathCause = 'generic';
+          state = 'menu';
+          TEP.UI?.showMenu?.();
+          TEP.Sound?.stopBGM?.();
+        }
         R.drawWorld({ level, player, echoes, nightGlowRadius }, camX, camY, C.THEMES[level.theme] || C.THEMES.cave);
         drawNightGlow();
         drawPauseScreen();
@@ -883,6 +925,10 @@ TEP.Game = (() => {
       case 'complete':
         R.spawnParticles(W/2 + (Math.random()-0.5)*200, H/3, '#ffd700', 1, 2);
         if (pressed('enter') || pressed('return')) {
+          keys['enter'] = false;
+          keys['return'] = false;
+          prevKeys['enter'] = false;
+          prevKeys['return'] = false;
           const nextNum = levelNum + 1;
           if (endlessActive) {
             loadLevel(nextNum, true, endlessSeed + nextNum * 0x1337);
@@ -893,8 +939,20 @@ TEP.Game = (() => {
           }
           TEP.Sound?.startBGM?.(level.theme);
         }
-        if (pressed('r')) { deathHandled = false; resetLevelState(); state = 'play'; TEP.Sound?.startBGM?.(level.theme); }
-        if (pressed('escape')) { state = 'menu'; TEP.UI?.showMenu?.(); }
+        if (pressed('r')) {
+          keys['r'] = false;
+          prevKeys['r'] = false;
+          deathHandled = false;
+          resetLevelState();
+          state = 'play';
+          TEP.Sound?.startBGM?.(level.theme);
+        }
+        if (pressed('escape')) {
+          keys['escape'] = false;
+          prevKeys['escape'] = false;
+          state = 'menu';
+          TEP.UI?.showMenu?.();
+        }
         R.drawWorld({ level, player, echoes, nightGlowRadius }, camX, camY, C.THEMES[level.theme] || C.THEMES.cave);
         drawNightGlow();
         drawCompleteScreen();
@@ -913,7 +971,6 @@ TEP.Game = (() => {
     prevKeys = {...keys};
     requestAnimationFrame(loop);
   }
-
   // ── Public API ─────────────────────────────────────
   return {
     init(c) {
